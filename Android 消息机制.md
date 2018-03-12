@@ -74,7 +74,7 @@
 
 # 【Android 消息机制】
 >**相关文章：**
->【[Android Handler](http://blog.csdn.net/Rtia33/article/details/79528830)】
+>【Android Handler】
 
 ## 前言
 在Android开发中，我们都知道**不能在主线程中执行耗时的任务**，**避免ANR**。
@@ -400,12 +400,14 @@ Handler handler = new Handler(){
     }
 };
 ```
-
+不管是**send**还是**post**，最终都是**在Handler创建时所在的线程执行**。
 
 ### 总结
 最后用一张图，来表示整个消息机制
 
 ![handler_java](http://upload-images.jianshu.io/upload_images/9028834-b4040b28d6b7cae1..jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+
 
 **图解：**
 
