@@ -67,6 +67,18 @@
     - [4.2 消息池](#42-%E6%B6%88%E6%81%AF%E6%B1%A0)
       - [4.2.1 obtain](#421-obtain)
       - [4.2.2 recycle](#422-recycle)
+- [常见问题](#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)
+    - [Looper 死循环为什么不会导致应用卡死？](#looper-%E6%AD%BB%E5%BE%AA%E7%8E%AF%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E4%BC%9A%E5%AF%BC%E8%87%B4%E5%BA%94%E7%94%A8%E5%8D%A1%E6%AD%BB)
+    - [主线程的消息循环机制是什么？](#%E4%B8%BB%E7%BA%BF%E7%A8%8B%E7%9A%84%E6%B6%88%E6%81%AF%E5%BE%AA%E7%8E%AF%E6%9C%BA%E5%88%B6%E6%98%AF%E4%BB%80%E4%B9%88)
+      - [总结](#%E6%80%BB%E7%BB%93-1)
+    - [ActivityThread 的动力是什么？](#activitythread-%E7%9A%84%E5%8A%A8%E5%8A%9B%E6%98%AF%E4%BB%80%E4%B9%88)
+    - [子线程有哪些更新UI的方法](#%E5%AD%90%E7%BA%BF%E7%A8%8B%E6%9C%89%E5%93%AA%E4%BA%9B%E6%9B%B4%E6%96%B0ui%E7%9A%84%E6%96%B9%E6%B3%95)
+      - [runOnUiThread](#runonuithread)
+      - [创建Handler，传入`getMainLooper`](#%E5%88%9B%E5%BB%BAhandler%E4%BC%A0%E5%85%A5getmainlooper)
+      - [View.post(Runnable r)](#viewpostrunnable-r)
+    - [子线程中Toast、showDialog的方法](#%E5%AD%90%E7%BA%BF%E7%A8%8B%E4%B8%ADtoastshowdialog%E7%9A%84%E6%96%B9%E6%B3%95)
+      - [总结](#%E6%80%BB%E7%BB%93-2)
+    - [如何处理Handler 使用不当导致的内存泄露？](#%E5%A6%82%E4%BD%95%E5%A4%84%E7%90%86handler-%E4%BD%BF%E7%94%A8%E4%B8%8D%E5%BD%93%E5%AF%BC%E8%87%B4%E7%9A%84%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1425,6 +1437,401 @@ void recycleUnchecked() {
 }
 ```
 
+# 常见问题
+
+### Looper 死循环为什么不会导致应用卡死？
+
+> 线程默认没有Looper的，如果需要使用Handler就必须为线程创建Looper。我们经常提到的主线程，也叫UI线程，它就是ActivityThread，ActivityThread被创建时就会初始化Looper，这也是在主线程中默认可以使用Handler的原因。
+
+首先我们看一段代码
+
+```java
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.e("qdx", "step 0 ");
+                Looper.prepare();
+
+                Toast.makeText(MainActivity.this, "run on Thread", Toast.LENGTH_SHORT).show();
+
+                Log.e("qdx", "step 1 ");
+                Looper.loop();
+
+                Log.e("qdx", "step 2 ");
+
+            }
+        }).start();
+```
+
+我们知道`Looper.loop();`里面维护了一个死循环方法，所以按照理论，上述代码执行的应该是 
+step 0 –>step 1 
+也就是说循环在`Looper.prepare();`与`Looper.loop();`之间。 
+![这里写图片描述](http://upload-images.jianshu.io/upload_images/9028834-6ed28d53a62383ae?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+> 在子线程中，如果手动为其创建了Looper，那么**在所有的事情完成以后应该调用quit方法来终止消息循环**，否则这个子线程就会一直处于等待（阻塞）状态，而如果退出Looper以后，这个线程就会立刻（执行所有方法并）终止，因此建议不需要的时候终止Looper。
+
+执行结果也正如我们所说，这时候如果了解了`ActivityThread`，并且在main方法中我们会看到主线程也是通过Looper方式来维持一个消息循环。
+
+```java
+/* ActivityThread源码 */
+public static void main(String[] args) {
+        ``````
+        Looper.prepareMainLooper();//创建Looper和MessageQueue对象，用于处理主线程的消息
+        ActivityThread thread = new ActivityThread();
+        thread.attach(false);//建立Binder通道 (创建新线程)
+        if (sMainThreadHandler == null) {
+            sMainThreadHandler = thread.getHandler();
+        }
+        Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);
+        Looper.loop();
+
+        //如果能执行下面方法，说明应用崩溃或者是退出了...
+        throw new RuntimeException("Main thread loop unexpectedly exited");
+    }
+```
+
+那么回到我们的问题上，这个死循环会不会导致应用卡死，即使不会的话，它会慢慢的消耗越来越多的资源吗？ 
+
+>摘自：[Gityuan–Handler(Native层)](http://gityuan.com/2015/12/27/handler-message-native/ "optional title")
+
+对于线程即是一段可执行的代码，当可执行代码执行完成后，线程生命周期便该终止了，线程退出。
+- 而对于**主线程**，我们是绝不希望会被运行一段时间，自己就退出，那么如何**保证**能**一直存活**呢？
+  简单做法就是**可执行代码是能一直执行下去**的，**死循环**便能保证不会被退出（例如，binder线程也是采用死循环的方法，通过循环方式不同与Binder驱动进行读写操作，当然并非简单地死循环，无消息时会休眠。）
+- 但这里可能又引发了另一个问题，既然是**死循环**又**如何去处理其他事务**呢？
+  通过**创建新线程**的方式。
+  真正会卡死主线程的操作是在回调方法onCreate/onStart/onResume等操作时间过长，会导致掉帧，甚至发生ANR，looper.loop本身不会导致应用卡死。
+
+- 主线程的死循环一直运行是不是特别消耗**CPU资源**呢？ 
+  **其实不然**，这里就涉及到Linux pipe/epoll机制，简单说就是在主线程的MessageQueue没有消息时，便阻塞在loop的queue.next()中的nativePollOnce()方法里，此时主线程会释放CPU资源进入休眠状态，直到下个消息到达或者有事务发生，通过往pipe管道写端写入数据来唤醒主线程工作。这里采用的epoll机制，是一种IO多路复用机制，可以同时监控多个描述符，当某个描述符就绪(读或写就绪)，则立刻通知相应程序进行读或写操作，本质同步I/O，即读写是阻塞的。 所以说，**主线程大多数时候都是处于休眠状态**，并不会消耗大量CPU资源。 
+
+
+
+### 主线程的消息循环机制是什么？
+
+事实上，会在进入死循环之前便创建了新binder线程，在代码ActivityThread.main()中：
+
+```java
+public static void main(String[] args) {
+        ....
+
+        //创建Looper和MessageQueue对象，用于处理主线程的消息
+        Looper.prepareMainLooper();
+
+        //创建ActivityThread对象
+        ActivityThread thread = new ActivityThread(); 
+
+        //建立Binder通道 (创建新线程)
+        thread.attach(false);
+
+        Looper.loop(); //消息循环运行
+        throw new RuntimeException("Main thread loop unexpectedly exited");
+    }
+```
+
+- **Activity的生命周期都是依靠主线程的Looper.loop**，当收到不同Message时则采用相应措施：一旦退出消息循环，那么你的程序也就可以退出了。 
+  从消息队列中取消息可能会阻塞，取到消息会做出相应的处理。如果某个消息处理时间过长，就可能会影响UI线程的刷新速率，造成卡顿的现象。
+
+- **`thread.attach(false)`**方法函数中便会创建一个Binder线程（具体是指`ApplicationThread`，Binder的服务端，用于接收系统服务AMS发送来的事件），该**Binder线程通过Handler将Message发送给主线程**。「[Activity 启动过程](http://blog.csdn.net/qian520ao/article/details/78156214 "optional title")」
+  比如收到msg=`H.LAUNCH_ACTIVITY`，则调用`ActivityThread.handleLaunchActivity()`方法，最终会通过反射机制，创建Activity实例，然后再执行Activity.onCreate()等方法；
+  再比如收到msg=`H.PAUSE_ACTIVITY`，则调用`ActivityThread.handlePauseActivity()`方法，最终会执行Activity.onPause()等方法。
+
+主线程的消息又是哪来的呢？当然是App进程中的其他线程通过Handler发送给主线程
+
+- system_server进程
+  system_server进程是系统进程，java framework框架的核心载体，里面运行了大量的系统服务，比如这里提供`ApplicationThreadProxy`（简称ATP），`ActivityManagerService`（简称AMS），这个两个服务都运行在system_server进程的不同线程中，由于ATP和AMS都是基于IBinder接口，都是binder线程，binder线程的创建与销毁都是由binder驱动来决定的。
+
+- App进程
+  App进程则是我们常说的应用程序，主线程主要负责Activity/Service等组件的生命周期以及UI相关操作都运行在这个线程； 另外，每个App进程中至少会有两个binder线程 `ApplicationThread`(简称AT)和`ActivityManagerProxy`（简称AMP），除了图中画的线程，其中还有很多线程
+
+- Binder
+  **Binder用于不同进程之间通信**，由一个进程的Binder客户端向另一个进程的服务端发送事务，比如图中线程2向线程4发送事务；
+  而handler用于同一个进程中不同线程的通信，比如图中线程4向主线程发送消息。
+
+![这里写图片描述](http://upload-images.jianshu.io/upload_images/9028834-d0b7627437af8789?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+结合图说说Activity生命周期，比如暂停Activity，流程如下：
+
+1. 线程1的AMS中调用线程2的ATP；（由于同一个进程的线程间资源共享，可以相互直接调用，但需要注意多线程并发问题）
+2. 线程2通过binder传输到App进程的线程4；
+3. 线程4通过handler消息机制，将暂停Activity的消息发送给主线程；
+4. 主线程在looper.loop()中循环遍历消息，当收到暂停Activity的消息时，便将消息分发给 
+   ActivityThread.H.handleMessage()方法，再经过方法的调用， 
+   最后便会调用到Activity.onPause()，当onPause()处理完后，继续循环loop下去。
+
+> 补充:
+> ActivityThread的main方法主要就是做消息循环，一旦退出消息循环，那么你的程序也就可以退出了。
+>
+> 从消息队列中取消息可能会阻塞，取到消息会做出相应的处理。如果某个消息处理时间过长，就可能会影响UI线程的刷新速率，造成卡顿的现象。
+
+
+#### 总结
+最后通过《Android开发艺术探索》的一段话总结 :
+ActivityThread通过ApplicationThread和AMS进行进程间通讯，AMS以进程间通信的方式完成ActivityThread的请求后会回调ApplicationThread中的Binder方法，然后ApplicationThread会向H发送消息，H收到消息后会将ApplicationThread中的逻辑切换到ActivityThread中去执行，即切换到主线程中去执行，这个过程就是。主线程的消息循环模型。
+
+另外，ActivityThread实际上并非线程，不像HandlerThread类，ActivityThread并没有真正继承Thread类。
+
+### ActivityThread 的动力是什么？
+
+- 进程 
+  每个app运行时前首先创建一个进程，该进程是由Zygote fork出来的，用于承载App上运行的各种Activity/Service等组件。进程对于上层应用来说是完全透明的，这也是google有意为之，让App程序都是运行在Android Runtime。大多数情况一个App就运行在一个进程中，除非在AndroidManifest.xml中配置Android:process属性，或通过native代码fork进程。 
+
+- 线程 
+  线程对应用来说非常常见，比如每次new Thread().start都会创建一个新的线程。该线程与App所在进程之间资源共享，从Linux角度来说进程与线程除了是否共享资源外，并没有本质的区别，都是一个task_struct结构体，在CPU看来进程或线程无非就是一段可执行的代码，CPU采用CFS调度算法，保证每个task都尽可能公平的享有CPU时间片。
+
+其实承载ActivityThread的主线程就是由Zygote fork而创建的进程。
+
+
+### 子线程有哪些更新UI的方法
+
+1. 主线程中定义Handler，子线程通过mHandler发送消息，主线程Handler的`handleMessage`更新UI。
+2. 用Activity对象的runOnUiThread方法。
+3. 创建Handler，传入`getMainLooper`。
+4. View.post(Runnable r) 。
+
+
+#### runOnUiThread
+
+Looper在哪个线程创建，就跟哪个线程绑定，并且Handler是在他关联的Looper对应的线程中处理消息的。（敲黑板）
+
+```java
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //DO UI method
+                    }
+                });
+            }
+        }).start();
+```
+
+```
+/* Activity源码 */
+    final Handler mHandler = new Handler();
+    public final void runOnUiThread(Runnable action) {
+        if (Thread.currentThread() != mUiThread) {
+            mHandler.post(action);//子线程（非UI线程）
+        } else {
+            action.run();
+        }
+    }
+```
+
+进入Activity类里面，可以看到如果是在子线程中，通过`mHandler`发送的更新UI消息。 
+而这个Handler是在Activity中创建的，也就是说在主线程中创建，所以便和我们在主线程中使用Handler更新UI没有差别。 
+因为这个Looper，就是ActivityThread中创建的Looper（`Looper.prepareMainLooper()`）。
+
+#### 创建Handler，传入`getMainLooper`
+
+同理，我们在子线程中，是否也可以创建一个Handler，并获取`MainLooper`，从而在子线程中更新UI呢？ 
+首先我们看到，在`Looper`类中有静态对象`sMainLooper`，并且这个`sMainLooper`就是在ActivityThread中创建的`MainLooper`。
+
+```java
+    private static Looper sMainLooper;  // guarded by Looper.class
+    public static void prepareMainLooper() {
+        prepare(false);
+        synchronized (Looper.class) {
+            if (sMainLooper != null) {
+                throw new IllegalStateException("The main Looper has already been prepared.");
+            }
+            sMainLooper = myLooper();
+        }
+    }
+```
+
+所以不用多说，我们就可以通过这个`sMainLooper`来进行更新UI操作。
+```java
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.e("qdx", "step 1 "+Thread.currentThread().getName());
+                Handler handler=new Handler(getMainLooper());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        //Do Ui method
+                        Log.e("qdx", "step 2 "+Thread.currentThread().getName());
+                    }
+                });
+            }
+        }).start();
+```
+
+![这里写图片描述](http://upload-images.jianshu.io/upload_images/9028834-5bbaf9b68d0f6492?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+#### View.post(Runnable r)
+
+老样子，我们点入源码
+```java
+/* View源码 */
+/**
+ * <p>Causes the Runnable to be added to the message queue.
+ * The runnable will be run on the user interface thread.</p>
+ *
+ * @param action The Runnable that will be executed.
+ *
+ * @return Returns true if the Runnable was successfully placed in to the
+ *         message queue.  Returns false on failure, usually because the
+ *         looper processing the message queue is exiting.
+ *
+ */
+public boolean post(Runnable action) {
+    final AttachInfo attachInfo = mAttachInfo;
+    if (attachInfo != null) {
+        return attachInfo.mHandler.post(action); //一般情况走这里
+    }
+
+    // Postpone the runnable until we know on which thread it needs to run.
+    // Assume that the runnable will be successfully placed after attach.
+    getRunQueue().post(action);
+    return true;
+}
+
+/**
+ * A Handler supplied by a view's {@link android.view.ViewRootImpl}. This
+ * handler can be used to pump events in the UI events queue.
+ */
+final Handler mHandler;
+```
+
+居然也是Handler从中作祟，根据Handler的注释，也可以清楚该Handler可以处理UI事件，也就是说它的Looper也是主线程的`sMainLooper`。这就是说我们常用的更新UI都是通过Handler实现的。
+
+另外更新UI 也可以通过`AsyncTask`来实现，这个`AsyncTask`的线程切换也是通过 Handler 。
+
+### 子线程中Toast、showDialog的方法
+
+
+```java
+new Thread(new Runnable() {
+    @Override
+    public void run() {
+        Toast.makeText(MainActivity.this, "run on thread", Toast.LENGTH_SHORT).show();//崩溃无疑
+    }
+}).start();
+```
+
+![这里写图片描述](http://upload-images.jianshu.io/upload_images/9028834-1f4897146e1a1ef8?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+看到这个崩溃日志，是否有些疑惑，因为一般如果子线程不能更新UI控件是会报如下错误的（子线程不能更新UI） 
+
+![这里写图片描述](http://upload-images.jianshu.io/upload_images/9028834-b7782aa2b8145f21?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+所以**子线程不能更新Toast的原因就和Handler有关**了，据我们了解，每一个Handler都要有对应的Looper对象，那么。 
+满足你：
+```java
+new Thread(new Runnable() {
+    @Override
+    public void run() {
+        Looper.prepare();
+        Toast.makeText(MainActivity.this, "run on thread", Toast.LENGTH_SHORT).show();//成功在子线程中Toast
+        Looper.loop();
+    }
+}).start();
+```
+
+这样便能在子线程中Toast。
+看一下Toast内部执行方式：
+```java
+/* Toast源码 */
+/**
+ * Show the view for the specified duration.
+ */
+public void show() {
+    ``````
+    INotificationManager service = getService();//从SMgr中获取名为notification的服务
+    String pkg = mContext.getOpPackageName();
+    TN tn = mTN;
+    tn.mNextView = mNextView;
+
+    try {
+        service.enqueueToast(pkg, tn, mDuration);//enqueue? 难不成和Handler的队列有关?
+    } catch (RemoteException e) {
+        // Empty
+    }
+}
+```
+
+在`show`方法中，我们看到Toast的show方法和普通UI 控件不太一样，并且也是通过Binder进程间通讯方法执行Toast绘制。这其中的过程就不在多讨论了，有兴趣的可以在`NotificationManagerService`类中分析。
+
+现在把目光放在`TN` 这个类上（难道越重要的类命名就越简洁，如`H`类），通过`TN` 类，可以了解到它是Binder的本地类。在Toast的show方法中，将这个`TN`对象传给`NotificationManagerService`就是为了通讯！并且我们也在TN中发现了它的show方法。
+
+```java
+/* Toast源码 */
+private static class TN extends ITransientNotification.Stub {//Binder服务端的具体实现类
+    /**
+     * schedule handleShow into the right thread
+     */
+    @Override
+    public void show(IBinder windowToken) {
+        mHandler.obtainMessage(0, windowToken).sendToTarget();
+    }
+    final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            IBinder token = (IBinder) msg.obj;
+            handleShow(token);
+        }
+    };
+}
+```
+
+看完上面代码，就知道子线程中Toast报错的原因，因为在`TN`中使用Handler，所以需要创建`Looper`对象。 
+那么既然用Handler来发送消息，就可以在`handleMessage`中找到更新Toast的方法。 
+在`handleMessage`看到由`handleShow`处理。
+
+```java
+//Toast的TN类
+    public void handleShow(IBinder windowToken) {
+            ``````
+            mWM = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+
+            mParams.x = mX;
+            mParams.y = mY;
+            mParams.verticalMargin = mVerticalMargin;
+            mParams.horizontalMargin = mHorizontalMargin;
+            mParams.packageName = packageName;
+            mParams.hideTimeoutMilliseconds = mDuration ==
+                Toast.LENGTH_LONG ? LONG_DURATION_TIMEOUT : SHORT_DURATION_TIMEOUT;
+            mParams.token = windowToken;
+            if (mView.getParent() != null) {
+                mWM.removeView(mView);
+            }
+            mWM.addView(mView, mParams);//使用WindowManager的addView方法
+            trySendAccessibilityEvent();
+        }
+    }
+```
+
+#### 总结
+
+Toast本质是通过window显示和绘制的（操作的是window），而子线程不能更新UI 是因为ViewRootImpl的checkThread方法在Activity维护的View树的行为。 
+Toast中TN类使用Handler是为了用队列和时间控制排队显示Toast，所以为了防止在创建TN时抛出异常，需要在子线程中使用Looper.prepare();和Looper.loop();（但是不建议这么做，因为它会使线程无法执行结束，导致内存泄露）
+
+
+Dialog亦是如此。同时我们又多了一个知识点要去研究：Android 中Window是什么，它内部有什么机制？
+
+### 如何处理Handler 使用不当导致的内存泄露？
+
+首先上文在子线程中为了节目效果，使用如下方式创建Looper
+
+```java
+Looper.prepare();
+...
+Looper.loop();
+```
+
+实际上这是**非常危险**的一种做法 
+
+> 在子线程中，如果手动为其创建Looper，那么在所有的事情完成以后应该调用quit方法来终止消息循环，否则这个子线程就会一直处于等待的状态，而如果退出Looper以后，这个线程就会立刻终止，因此建议不需要的时候终止Looper。(【 Looper.myLooper().quit(); 】)
+
+那么，如果在Handler的`handleMessage`方法中（或者是run方法）处理消息，如果这个是一个延时消息，会一直保存在主线程的消息队列里，并且会影响系统对Activity的回收，造成内存泄露。
+
+解决Handler内存泄露主要2点
+1. 有延时消息，要在Activity销毁的时候移除`Messages`
+2. [匿名内部类](http://www.cnblogs.com/nerxious/archive/2013/01/25/2876489.html "optional title")导致的泄露改为匿名静态内部类，并且对上下文或者Activity使用弱引用。
+
 
 
 
@@ -1434,6 +1841,7 @@ void recycleUnchecked() {
 ★★★★★[Android的消息机制](http://blog.csdn.net/c10WTiybQ1Ye3/article/details/78098843)
 ★★★★[Android消息机制1-Handler(Java层)](http://gityuan.com/2015/12/26/handler-message-framework/)
 ★[Android 源码分析之旅3.1--消息机制源码分析](https://www.jianshu.com/p/ac50ba6ba3a2)
+★★★[Android 消息机制——你真的了解Handler？](http://blog.csdn.net/qian520ao/article/details/78262289)
 [Android消息机制-ThreadLocal原理解析：数据存取](https://www.jianshu.com/p/cadf7c824677)
 
 
