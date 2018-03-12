@@ -1,3 +1,23 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [【Android 事件分发】](#android-%E4%BA%8B%E4%BB%B6%E5%88%86%E5%8F%91)
+  - [三个重要的方法](#%E4%B8%89%E4%B8%AA%E9%87%8D%E8%A6%81%E7%9A%84%E6%96%B9%E6%B3%95)
+    - [dispatchTouchEvent](#dispatchtouchevent)
+    - [onInterceptTouchEvent](#onintercepttouchevent)
+    - [onTouchEvent](#ontouchevent)
+  - [事件的传递规则](#%E4%BA%8B%E4%BB%B6%E7%9A%84%E4%BC%A0%E9%80%92%E8%A7%84%E5%88%99)
+  - [源码分析](#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+    - [判断是否拦截](#%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E6%8B%A6%E6%88%AA)
+    - [不拦截事件](#%E4%B8%8D%E6%8B%A6%E6%88%AA%E4%BA%8B%E4%BB%B6)
+    - [拦截事件](#%E6%8B%A6%E6%88%AA%E4%BA%8B%E4%BB%B6)
+    - [View对事件的处理](#view%E5%AF%B9%E4%BA%8B%E4%BB%B6%E7%9A%84%E5%A4%84%E7%90%86)
+  - [案例解析](#%E6%A1%88%E4%BE%8B%E8%A7%A3%E6%9E%90)
+  - [注意事项](#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 
 # 【Android 事件分发】

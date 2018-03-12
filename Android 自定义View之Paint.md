@@ -1,3 +1,11 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [详解Paint的setShader(Shader shader)](#%E8%AF%A6%E8%A7%A3paint%E7%9A%84setshadershader-shader)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # [详解Paint的setShader(Shader shader)](http://www.cnblogs.com/tianzhijiexian/p/4298660.html)
 
 **一、概述**

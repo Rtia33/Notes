@@ -114,10 +114,6 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-
-
-
-
 # 【Android Activity】
 
 <span id="什么是 Activity?"/>
@@ -1427,7 +1423,7 @@ public class DemoRemoteThemeActivity extends Activity {
 ## Android 中 Activity 是如何启动的？（2017-2-24）
 
  Activity 启动时的概要交互流程如下图：
-[![流程图](http://img.blog.csdn.net/20180126172405287?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)](http://img.blog.csdn.net/20180126172405287?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+[![流程图](https://github.com/Rtia33/Notes/blob/master/Pics/Activity%E5%90%AF%E5%8A%A8%E6%A6%82%E8%A6%81%E4%BA%A4%E4%BA%92%E6%B5%81%E7%A8%8B%E5%9B%BE.png?raw=true)](https://github.com/Rtia33/Notes/blob/master/Pics/Activity%E5%90%AF%E5%8A%A8%E6%A6%82%E8%A6%81%E4%BA%A4%E4%BA%92%E6%B5%81%E7%A8%8B%E5%9B%BE.png?raw=true)
 
 用户在 Launcher 程序里点击应用图标时，会通知 ActivityManagerService 启动应用的入口 Activity，ActivityManagerService 发现这个应用还未启动，则会通知 Zygote 进程孵化出应用进程，然后在这个 dalvik 应用进程里执行 ActivityThread 的 main 方法。在该方法里会先准备好 Looper 和消息队列，然后调用 attach 方法将应用进程绑定到 ActivityManagerService，然后进入 loop 循环，不断地读取消息队列里的消息，并分发消息。
 

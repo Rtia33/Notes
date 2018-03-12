@@ -1,3 +1,19 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [【Android Handler】](#android-handler)
+  - [HandlerThread](#handlerthread)
+    - [1.1 创建](#11-%E5%88%9B%E5%BB%BA)
+    - [1.2 getLooper](#12-getlooper)
+    - [1.3 运行](#13-%E8%BF%90%E8%A1%8C)
+    - [1.4 退出](#14-%E9%80%80%E5%87%BA)
+  - [二、实战](#%E4%BA%8C%E5%AE%9E%E6%88%98)
+    - [2.1 利用HandlerThread](#21-%E5%88%A9%E7%94%A8handlerthread)
+    - [2.2 直接创建线程](#22-%E7%9B%B4%E6%8E%A5%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 
 # 【Android Handler】
