@@ -1,3 +1,26 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [【Android 线程池】](#android-%E7%BA%BF%E7%A8%8B%E6%B1%A0)
+- [**ExecutorService**](#executorservice)
+  - [**使用线程池管理线程的优点**](#%E4%BD%BF%E7%94%A8%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%AE%A1%E7%90%86%E7%BA%BF%E7%A8%8B%E7%9A%84%E4%BC%98%E7%82%B9)
+  - [**ExecutorService简介**](#executorservice%E7%AE%80%E4%BB%8B)
+    - [**线程池：ThreadPoolExecutor**](#%E7%BA%BF%E7%A8%8B%E6%B1%A0threadpoolexecutor)
+  - [**线程池ThreadPoolExecutor的使用**](#%E7%BA%BF%E7%A8%8B%E6%B1%A0threadpoolexecutor%E7%9A%84%E4%BD%BF%E7%94%A8)
+    - [**自定义线程池ThreadPoolExecutor**](#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BA%BF%E7%A8%8B%E6%B1%A0threadpoolexecutor)
+      - [**1、首先我们创建一个基于PriorityBlockingQueue实现的线程池，为了测试方便，我这里把核心线程数量设置为3，如下：**](#1%E9%A6%96%E5%85%88%E6%88%91%E4%BB%AC%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E5%9F%BA%E4%BA%8Epriorityblockingqueue%E5%AE%9E%E7%8E%B0%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0%E4%B8%BA%E4%BA%86%E6%B5%8B%E8%AF%95%E6%96%B9%E4%BE%BF%E6%88%91%E8%BF%99%E9%87%8C%E6%8A%8A%E6%A0%B8%E5%BF%83%E7%BA%BF%E7%A8%8B%E6%95%B0%E9%87%8F%E8%AE%BE%E7%BD%AE%E4%B8%BA3%E5%A6%82%E4%B8%8B)
+      - [**2、然后创建一个实现Runnable接口的类，并向外提供一个抽象方法供我们实现自定义功能，并实现Comparable接口，实现这个接口主要就是进行优先级的比较，代码如下：**](#2%E7%84%B6%E5%90%8E%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E5%AE%9E%E7%8E%B0runnable%E6%8E%A5%E5%8F%A3%E7%9A%84%E7%B1%BB%E5%B9%B6%E5%90%91%E5%A4%96%E6%8F%90%E4%BE%9B%E4%B8%80%E4%B8%AA%E6%8A%BD%E8%B1%A1%E6%96%B9%E6%B3%95%E4%BE%9B%E6%88%91%E4%BB%AC%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8A%9F%E8%83%BD%E5%B9%B6%E5%AE%9E%E7%8E%B0comparable%E6%8E%A5%E5%8F%A3%E5%AE%9E%E7%8E%B0%E8%BF%99%E4%B8%AA%E6%8E%A5%E5%8F%A3%E4%B8%BB%E8%A6%81%E5%B0%B1%E6%98%AF%E8%BF%9B%E8%A1%8C%E4%BC%98%E5%85%88%E7%BA%A7%E7%9A%84%E6%AF%94%E8%BE%83%E4%BB%A3%E7%A0%81%E5%A6%82%E4%B8%8B)
+      - [**3、使用我们自己的PriorityRunnable提交任务，整体代码如下：**](#3%E4%BD%BF%E7%94%A8%E6%88%91%E4%BB%AC%E8%87%AA%E5%B7%B1%E7%9A%84priorityrunnable%E6%8F%90%E4%BA%A4%E4%BB%BB%E5%8A%A1%E6%95%B4%E4%BD%93%E4%BB%A3%E7%A0%81%E5%A6%82%E4%B8%8B)
+      - [**测试效果**](#%E6%B5%8B%E8%AF%95%E6%95%88%E6%9E%9C)
+      - [**优先级线程池的优点**](#%E4%BC%98%E5%85%88%E7%BA%A7%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E4%BC%98%E7%82%B9)
+    - [**扩展线程池ThreadPoolExecutor**](#%E6%89%A9%E5%B1%95%E7%BA%BF%E7%A8%8B%E6%B1%A0threadpoolexecutor)
+    - [**优化线程池ThreadPoolExecutor**](#%E4%BC%98%E5%8C%96%E7%BA%BF%E7%A8%8B%E6%B1%A0threadpoolexecutor)
+    - [**shutdown()和shutdownNow()的区别**](#shutdown%E5%92%8Cshutdownnow%E7%9A%84%E5%8C%BA%E5%88%AB)
+    - [**关于AsyncTask的实现**](#%E5%85%B3%E4%BA%8Easynctask%E7%9A%84%E5%AE%9E%E7%8E%B0)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 
 # 【Android 线程池】

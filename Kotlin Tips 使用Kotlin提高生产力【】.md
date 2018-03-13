@@ -2,7 +2,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [RTRT 待整理【Kotlin Tips 使用Kotlin提高生产力】](#rtrt-%E5%BE%85%E6%95%B4%E7%90%86kotlin-tips-%E4%BD%BF%E7%94%A8kotlin%E6%8F%90%E9%AB%98%E7%94%9F%E4%BA%A7%E5%8A%9B)
+- [【Kotlin Tips 使用Kotlin提高生产力】](#kotlin-tips-%E4%BD%BF%E7%94%A8kotlin%E6%8F%90%E9%AB%98%E7%94%9F%E4%BA%A7%E5%8A%9B)
   - [Tip1- 更简洁的字符串](#tip1--%E6%9B%B4%E7%AE%80%E6%B4%81%E7%9A%84%E5%AD%97%E7%AC%A6%E4%B8%B2)
   - [Tip2- Kotlin中大多数控制结构都是表达式](#tip2--kotlin%E4%B8%AD%E5%A4%A7%E5%A4%9A%E6%95%B0%E6%8E%A7%E5%88%B6%E7%BB%93%E6%9E%84%E9%83%BD%E6%98%AF%E8%A1%A8%E8%BE%BE%E5%BC%8F)
       - [语句和表达式是什么？](#%E8%AF%AD%E5%8F%A5%E5%92%8C%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%98%AF%E4%BB%80%E4%B9%88)

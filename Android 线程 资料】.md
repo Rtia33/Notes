@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [【Android 线程 资料】](#android-%E7%BA%BF%E7%A8%8B-%E8%B5%84%E6%96%99)
+        - [**不过不建议使用AsyncTask，因为4.x系统中AsyncTask是串行的，高并发的Task让AsyncTask一个一个串行执行，程序就会很慢。可以看看这篇译文讲解具体原因：**](#%E4%B8%8D%E8%BF%87%E4%B8%8D%E5%BB%BA%E8%AE%AE%E4%BD%BF%E7%94%A8asynctask%E5%9B%A0%E4%B8%BA4x%E7%B3%BB%E7%BB%9F%E4%B8%ADasynctask%E6%98%AF%E4%B8%B2%E8%A1%8C%E7%9A%84%E9%AB%98%E5%B9%B6%E5%8F%91%E7%9A%84task%E8%AE%A9asynctask%E4%B8%80%E4%B8%AA%E4%B8%80%E4%B8%AA%E4%B8%B2%E8%A1%8C%E6%89%A7%E8%A1%8C%E7%A8%8B%E5%BA%8F%E5%B0%B1%E4%BC%9A%E5%BE%88%E6%85%A2%E5%8F%AF%E4%BB%A5%E7%9C%8B%E7%9C%8B%E8%BF%99%E7%AF%87%E8%AF%91%E6%96%87%E8%AE%B2%E8%A7%A3%E5%85%B7%E4%BD%93%E5%8E%9F%E5%9B%A0)
+        - [**RejectedExecutionHandler 的四种拒绝策略**](#rejectedexecutionhandler-%E7%9A%84%E5%9B%9B%E7%A7%8D%E6%8B%92%E7%BB%9D%E7%AD%96%E7%95%A5)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 
 # 【Android 线程 资料】
