@@ -1,3 +1,19 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [【Android 自定义LayoutManager 实现弧形以及滑动放大】](#android-%E8%87%AA%E5%AE%9A%E4%B9%89layoutmanager-%E5%AE%9E%E7%8E%B0%E5%BC%A7%E5%BD%A2%E4%BB%A5%E5%8F%8A%E6%BB%91%E5%8A%A8%E6%94%BE%E5%A4%A7)
+    - [通常重写一个 LayoutManager 可以分为以下几个步骤](#%E9%80%9A%E5%B8%B8%E9%87%8D%E5%86%99%E4%B8%80%E4%B8%AA-layoutmanager-%E5%8F%AF%E4%BB%A5%E5%88%86%E4%B8%BA%E4%BB%A5%E4%B8%8B%E5%87%A0%E4%B8%AA%E6%AD%A5%E9%AA%A4)
+      - [指定默认的 LayoutParams](#%E6%8C%87%E5%AE%9A%E9%BB%98%E8%AE%A4%E7%9A%84-layoutparams)
+      - [测量并记录每个 item 的信息](#%E6%B5%8B%E9%87%8F%E5%B9%B6%E8%AE%B0%E5%BD%95%E6%AF%8F%E4%B8%AA-item-%E7%9A%84%E4%BF%A1%E6%81%AF)
+      - [回收以及放置各个 item](#%E5%9B%9E%E6%94%B6%E4%BB%A5%E5%8F%8A%E6%94%BE%E7%BD%AE%E5%90%84%E4%B8%AA-item)
+      - [处理滚动](#%E5%A4%84%E7%90%86%E6%BB%9A%E5%8A%A8)
+    - [Bonuses](#bonuses)
+      - [添加回弹](#%E6%B7%BB%E5%8A%A0%E5%9B%9E%E5%BC%B9)
+    - [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 
 # 【Android 自定义LayoutManager 实现弧形以及滑动放大】
@@ -9,9 +25,7 @@
 
 下面我们就来介绍怎么通过重写一个 LayoutManager 来实现一个弧形的 recycylerview 以及另一个会随着滚动在指定位置缩放的 recyclerview。并实现类似 viewpager 的回弹效果。
 
-[![](http://upload-images.jianshu.io/upload_images/9028834-17c48ff7c7315bd4?imageMogr2/auto-orient/strip)](http://upload-images.jianshu.io/upload_images/9028834-17c48ff7c7315bd4?imageMogr2/auto-orient/strip)
-
- ![技术分享](http://upload-images.jianshu.io/upload_images/9028834-7adee7890c2b2e0b?imageMogr2/auto-orient/strip)
+[![](http://upload-images.jianshu.io/upload_images/9028834-17c48ff7c7315bd4?imageMogr2/auto-orient/strip)](http://upload-images.jianshu.io/upload_images/9028834-17c48ff7c7315bd4?imageMogr2/auto-orient/strip)[![技术分享](http://upload-images.jianshu.io/upload_images/9028834-7adee7890c2b2e0b?imageMogr2/auto-orient/strip)](http://upload-images.jianshu.io/upload_images/9028834-7adee7890c2b2e0b?imageMogr2/auto-orient/strip)
 
 项目地址 [Github](https://github.com/leochuan/CircleLayoutManager)
 
