@@ -1,11 +1,3 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
-
-- [【Android 开发模式 MVP】](#android-%E5%BC%80%E5%8F%91%E6%A8%A1%E5%BC%8F-mvp)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 
 
 # 【Android 开发模式 MVP】
@@ -69,10 +61,12 @@ MVP的使用
 
 **ILoginView **接口代码如下：
 
-<pre class="" style="margin: 0px 0px 16px 15px; padding: 10px 20px; max-width: 100%; box-sizing: border-box; word-wrap: normal; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration-style: initial; text-decoration-color: initial; font-family: Consolas, &quot;Liberation Mono&quot;, Menlo, Courier, monospace; font-size: 13.6px; font-stretch: normal; line-height: 1.45; overflow: auto; border-radius: 3px; color: rgb(51, 51, 51); background-color: rgb(247, 247, 247);">public interface ILoginView {
+```java
+public interface ILoginView {
     public void onClearText();
     public void onLoginResult(Boolean result, int code);
-}</pre>
+}
+```
 
 可以看出 **ILoginView **只是一个接口，简单的定义了两个方法。
 
@@ -142,7 +136,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView,View.
 }
 ```
 
-![image](http://upload-images.jianshu.io/upload_images/9028834-1b5a1e51451d32a1?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 
 在 **LoginActivity **中我们可以看到，**LoginActivity **实现了 **ILoginView **接口，实现了未实现的方法，在代码中可以看出 **LoginActivity **并没有做一些逻辑处理工作，数据处理的工作都是调用 **ILoginPresenter **完成的。
 
@@ -150,16 +144,18 @@ public class LoginActivity extends AppCompatActivity implements ILoginView,View.
 
 下面就来看看 **ILoginPresenter**：
 
-<pre class="" style="margin: 0px 0px 16px 15px; padding: 10px 20px; max-width: 100%; box-sizing: border-box; word-wrap: normal; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration-style: initial; text-decoration-color: initial; font-family: Consolas, &quot;Liberation Mono&quot;, Menlo, Courier, monospace; font-size: 13.6px; font-stretch: normal; line-height: 1.45; overflow: auto; border-radius: 3px; color: rgb(51, 51, 51); background-color: rgb(247, 247, 247);">public interface ILoginPresenter {
+```java
+public interface ILoginPresenter {
     public void clear();
     public void doLogin(String name, String password);
-}</pre>
+}
+```
 
 也是简单的接口定义两个未实现的方法。
 
 看看其实现类 **LoginPresenterCompl**：
 
-```
+```java
 public class LoginPresenterCompl implements ILoginPresenter {
  
     private ILoginView loginView ;
@@ -193,7 +189,7 @@ public class LoginPresenterCompl implements ILoginPresenter {
 }
 ```
 
-![image](http://upload-images.jianshu.io/upload_images/9028834-6d20c40de5e94199?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 
 该实现类也比较简单，定义了用户名是张三，密码是123456的一个登陆用户，然后进行登陆和清除的操作。
 
@@ -201,31 +197,33 @@ public class LoginPresenterCompl implements ILoginPresenter {
 
 **User **的代码如下：
 
-<pre class="" style="margin: 0px 0px 16px 15px; padding: 10px 20px; max-width: 100%; box-sizing: border-box; word-wrap: normal; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration-style: initial; text-decoration-color: initial; font-family: Consolas, &quot;Liberation Mono&quot;, Menlo, Courier, monospace; font-size: 13.6px; font-stretch: normal; line-height: 1.45; overflow: auto; border-radius: 3px; color: rgb(51, 51, 51); background-color: rgb(247, 247, 247);">public class User {
+```java
+public class User {
     private String name;
     private String password;
-    
+
     public User(String name,String password){
         this.name = name;
         this.password = password;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public String getPassword() {
         return password;
     }
-    
+
     public void setPassword(String password) {
         this.password = password;
     }
-}</pre>
+}
+```
 
 OK，这就完成了最简单的 **MVP****模式** 了。
 
@@ -270,6 +268,7 @@ Java一个强大的功能就是其虚拟机的内存回收机制，这个功能�
 总结
 
 以上就是 **MV****P的简单实现**，可能示例代码太简单无法体现 **MVP****的优势**，但是理解了 **MVP****的思路 **在项目中使用 **MVP **就才能够真正体验到 **MVP **带来的好处优势。
+
 
 
 
