@@ -1,3 +1,18 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [ViewPager 超详解：玩出十八般花样](#viewpager-%E8%B6%85%E8%AF%A6%E8%A7%A3%E7%8E%A9%E5%87%BA%E5%8D%81%E5%85%AB%E8%88%AC%E8%8A%B1%E6%A0%B7)
+  - [ViewPager 的基础使用](#viewpager-%E7%9A%84%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8)
+    - [PagerAdapter](#pageradapter)
+  - [ViewPager + TabLayout + Fragment 的结合使用](#viewpager--tablayout--fragment-%E7%9A%84%E7%BB%93%E5%90%88%E4%BD%BF%E7%94%A8)
+  - [ViewPager 轮播图的使用](#viewpager-%E8%BD%AE%E6%92%AD%E5%9B%BE%E7%9A%84%E4%BD%BF%E7%94%A8)
+  - [自定义 ViewPager 的切换效果](#%E8%87%AA%E5%AE%9A%E4%B9%89-viewpager-%E7%9A%84%E5%88%87%E6%8D%A2%E6%95%88%E6%9E%9C)
+  - [ViewPager 切换效果进阶](#viewpager-%E5%88%87%E6%8D%A2%E6%95%88%E6%9E%9C%E8%BF%9B%E9%98%B6)
+  - [结尾](#%E7%BB%93%E5%B0%BE)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # ViewPager 超详解：玩出十八般花样
 
 http://blog.csdn.net/shedoor/article/details/78957852

@@ -36,7 +36,8 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# RTRT 待整理【Kotlin Tips 使用Kotlin提高生产力】
+# 【Kotlin Tips 使用Kotlin提高生产力】
+
 RTRT待整理
 
 汇总Kotlin相对于Java的优势，以及怎么用Kotlin去简洁、务实、高效、安全的开发，每个小点tip都有详细的说明和案例代码，争取把每个tip分析得清楚易懂，会不断的更新维护tips，欢迎fork进来加入我们一起来维护，有问题的话欢迎提Issues。
