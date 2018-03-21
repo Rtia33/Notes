@@ -25,8 +25,6 @@
 
 
 
-
-
 # **【AndroidStudio 常见问题】**
 
 # **软件问题：**
@@ -45,35 +43,34 @@
 
 ------
 
-## [缓存文件夹配置](http://blog.csdn.net/moira33/article/details/78553131)
+## [缓存文件夹配置](http://blog.csdn.net/Rtia33/article/details/79645318)
 
 ------
 
-## [SDK Manager.exe 无法打开，一闪而过](http://blog.csdn.net/moira33/article/details/78553111)
+## SDK Manager.exe 无法打开，一闪而过
 
 重装SDK-->下载SDK Tools（[android SDKinstaller_r24.4.1-windows.exe](https://link.jianshu.com/?t=http://pan.baidu.com/s/1hsI5Yao)）直接覆盖安装在Tools文件夹下
 
 ------
 
-## [Gradle手动下载](http://blog.csdn.net/moira33/article/details/78549351)
+## [Gradle手动下载](http://blog.csdn.net/Rtia33/article/details/79645446)
 
-下载好的压缩包和解压后的文件夹复制到gradle-2.14.1-all --->8bnwg5hd3w55iofp58khbp6yv文件夹下；
-将gradle-2.14.1-all.zip.part文件删除；
-复制一份gradle-2.14.1-all.zip.lck文件，重命名为gradle-2.14.1-all.zip.ok；
-重启as。
+1. 下载好的压缩包和解压后的文件夹复制到/.gradle/wrapper/dists/gradle-2.14.1-all/8bnwg5hd3w55iofp58khbp6yv文件夹下；
+2. 将gradle-2.14.1-all.zip.part文件删除；
+3. 复制一份gradle-2.14.1-all.zip.lck文件，重命名为gradle-2.14.1-all.zip.ok；
+4. 重启as。
 
 ------
 
 ## No JVM installation found-->需要安装jdk7
 
- ![这里写图片描述](http://img.blog.csdn.net/20171115220930250?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![](https://upload-images.jianshu.io/upload_images/9028834-6065ab61f87c2cf2.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ------
 
 ## 安装完启动时提示下载sdk
 
- ![这里写图片描述](http://img.blog.csdn.net/20171115220946603?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
-
+![1.jpg](https://upload-images.jianshu.io/upload_images/9028834-68391fde89e413af.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 解决方式：
 点击取消，如果android studio还进不去，按以下方式进行设置：
 （a）进入刚安装的Android Studio目录下的bin目录。找到idea.properties文件，用文本编辑器打开。
@@ -83,7 +80,15 @@ disable.android.first.run=true
 
 ------
 
-## [查看task栈情况](http://blog.csdn.net/moira33/article/details/78845935)
+## [查看task栈情况](http://blog.csdn.net/Rtia33/article/details/79645794)
+
+在cmd命令行里或者AndroidStudio中的**Terminal**里敲入如下命令：
+
+```
+adb shell dumpsys activity
+```
+
+然后会出现很长一段详细信息，滚到中间的地方，会看到Task栈的状态
 
 ------
 
@@ -98,13 +103,13 @@ disable.android.first.run=true
 ## 导入项目一直Building
 
 AndroidStudio导入项目一直卡在Building gradle project info，实际上是因为你导入的这个项目使用的gradle与你已经拥有的gradle版本不一致，导致需要下载该项目需要的gradle版本,会一直卡住，直至下载完成。
--->[手动下载所需Gradle](http://blog.csdn.net/moira33/article/details/78549351)，或者设置翻墙让他自己下载。
+-->[手动下载所需Gradle](http://blog.csdn.net/Rtia33/article/details/79645446)，或者设置翻墙让他自己下载。
 
 ------
 
-## [Failed to open zip file](http://blog.csdn.net/moira33/article/details/78553093)
+## [Failed to open zip file](http://blog.csdn.net/Rtia33/article/details/79645860)
 
-[手动下载所需Gradle](http://blog.csdn.net/moira33/article/details/78549351)
+[手动下载所需Gradle](http://blog.csdn.net/Rtia33/article/details/79645446)
 
 ------
 
@@ -137,7 +142,32 @@ Error while Installing APK
 
 ------
 
-## [Could not find com.android.tools.build:gradle](http://blog.csdn.net/moira33/article/details/78850806)
+## [Could not find com.android.tools.build:gradle](http://blog.csdn.net/Rtia33/article/details/79645955)
+
+
+
+解决方法：进入```%android-studio安装目录%\gradle\m2repository\com\android\tools\build\gradle```
+![](http://upload-images.jianshu.io/upload_images/9028834-d38103c5f3916456?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+将项目build.gradle文件中
+
+```
+dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.1'
+}
+```
+
+改为现有的
+
+```
+dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.0'
+}
+```
+
+
+
+
 
 ------
 
@@ -148,9 +178,15 @@ Error while Installing APK
 ------
 
 ## Caused by: java.lang.IllegalStateException: This Activity already has an action bar supplied by the window decor. Do not request Window.FEATURE_SUPPORT_ACTION_BAR and set windowActionBar to false in your theme to use a Toolbar instead.
+
 给其所在Activity添加
-``` xml
+
+```xml
 <item name="windowNoTitle">true</item>
 ```
+
 即可
+
+
+
 
