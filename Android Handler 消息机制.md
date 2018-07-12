@@ -1,5 +1,4 @@
 # 【Android Handler 消息机制】
-
 ## 前言
 
 在Android开发中，我们都知道**不能在主线程中执行耗时的任务**，**避免ANR**。
@@ -2076,7 +2075,7 @@ new Thread(new Runnable() {
 我们知道`Looper.loop();`里面维护了一个死循环方法，所以按照理论，上述代码执行的应该是 
 step 0 –>step 1 
 也就是说循环在`Looper.prepare();`与`Looper.loop();`之间。 
-![这里写图片描述](http://upload-images.jianshu.io/upload_images/9028834-6ed28d53a62383ae?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](http://upload-images.jianshu.io/upload_images/9028834-6ed28d53a62383ae?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 > 在子线程中，如果手动为其创建了Looper，那么**在所有的事情完成以后应该调用quit方法来终止消息循环**，否则这个子线程就会一直处于等待（阻塞）状态，而如果退出Looper以后，这个线程就会立刻（执行所有方法并）终止，因此建议不需要的时候终止Looper。
 
@@ -2157,7 +2156,7 @@ App进程则是我们常说的应用程序，主线程主要负责Activity/Servi
 **Binder用于不同进程之间通信**，由一个进程的Binder客户端向另一个进程的服务端发送事务，比如图中线程2向线程4发送事务；
 而handler用于同一个进程中不同线程的通信，比如图中线程4向主线程发送消息。
 
-![这里写图片描述](http://upload-images.jianshu.io/upload_images/9028834-d0b7627437af8789?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](http://upload-images.jianshu.io/upload_images/9028834-d0b7627437af8789?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 结合图说说Activity生命周期，比如暂停Activity，流程如下：
 
@@ -2323,11 +2322,11 @@ new Thread(new Runnable() {
 }).start();
 ```
 
-![这里写图片描述](http://upload-images.jianshu.io/upload_images/9028834-1f4897146e1a1ef8?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](http://upload-images.jianshu.io/upload_images/9028834-1f4897146e1a1ef8?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 看到这个崩溃日志，是否有些疑惑，因为一般如果子线程不能更新UI控件是会报如下错误的（子线程不能更新UI） 
 
-![这里写图片描述](http://upload-images.jianshu.io/upload_images/9028834-b7782aa2b8145f21?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](http://upload-images.jianshu.io/upload_images/9028834-b7782aa2b8145f21?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 所以**子线程不能更新Toast的原因就和Handler有关**了，据我们了解，每一个Handler都要有对应的Looper对象，那么。 
 满足你：
@@ -2457,11 +2456,6 @@ Looper.loop();
 
 【见 常见问题-子线程有哪些更新UI的方法】
 
-### HandlerThread
-
-HandlerThread继承自Thread，内部保存一个Looper对象。 
-这是一个系统帮我们包装好的Thread，这个线程的run方法已经调用了Looper.prepare和Looper.loop（即已经绑定了一个Looper对象，并且可以开始轮询消息），创建该对象之后可以通过获得对象获取到一个Looper对象，将Looper对象传递给Handler，完成Handler和Looper以及MessageQueue的绑定。最后再其他的线程中调用Handler的sendMessage或者post(Runable)方法发送消息，handler中的callback.handleMessage方法会在HandlerThread中运行。即，将消息发送到了特定的线程（此处是HandlerThread）处理。
-
 ### IntentService
 
 IntentService继承自Service，运行时优先级更高，内部使用了HandlerThread作为处理消息的线程。内部有一个私有内部类ServiceHandler继承自Handler，并且会创建一个ServiceHandler对象。 
@@ -2491,9 +2485,4 @@ IntentService继承自Service，运行时优先级更高，内部使用了Handle
 [Android Handler消息机制实现原理](https://www.jianshu.com/p/6cc4d4b4676b)
 ★★★★[Android基础夯实--你了解Handler有多少？](http://www.cnblogs.com/ryanleee/p/8204450.html)
 ★★★[Android消息机制3-Handler(实战)](http://gityuan.com/2016/01/01/handler-message-usage/)
-
-
-
-
-
 
