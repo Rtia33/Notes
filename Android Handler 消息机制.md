@@ -1,46 +1,4 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
-
-- [【Android Handler】](#android-handler)
-  - [概述](#%E6%A6%82%E8%BF%B0)
-  - [Looper、MessageQueue、Message、Handler的关系](#loopermessagequeuemessagehandler%E7%9A%84%E5%85%B3%E7%B3%BB)
-    - [Looper](#looper)
-    - [MessageQueue](#messagequeue)
-    - [Message](#message)
-  - [Handler的主要用途](#handler%E7%9A%84%E4%B8%BB%E8%A6%81%E7%94%A8%E9%80%94)
-    - [1\. 推送未来某个时间点将要执行的Message或者Runnable到消息队列](#1%5C-%E6%8E%A8%E9%80%81%E6%9C%AA%E6%9D%A5%E6%9F%90%E4%B8%AA%E6%97%B6%E9%97%B4%E7%82%B9%E5%B0%86%E8%A6%81%E6%89%A7%E8%A1%8C%E7%9A%84message%E6%88%96%E8%80%85runnable%E5%88%B0%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97)
-    - [2\. 在子线程把需要在另一个线程执行的操作加入到消息队列中去](#2%5C-%E5%9C%A8%E5%AD%90%E7%BA%BF%E7%A8%8B%E6%8A%8A%E9%9C%80%E8%A6%81%E5%9C%A8%E5%8F%A6%E4%B8%80%E4%B8%AA%E7%BA%BF%E7%A8%8B%E6%89%A7%E8%A1%8C%E7%9A%84%E6%93%8D%E4%BD%9C%E5%8A%A0%E5%85%A5%E5%88%B0%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E4%B8%AD%E5%8E%BB)
-      - [实例：通过Handler + Message来实现子线程加载图片，在UI线程显示图片](#%E5%AE%9E%E4%BE%8B%E9%80%9A%E8%BF%87handler--message%E6%9D%A5%E5%AE%9E%E7%8E%B0%E5%AD%90%E7%BA%BF%E7%A8%8B%E5%8A%A0%E8%BD%BD%E5%9B%BE%E7%89%87%E5%9C%A8ui%E7%BA%BF%E7%A8%8B%E6%98%BE%E7%A4%BA%E5%9B%BE%E7%89%87)
-  - [Handler推送Message和Runnable的区别](#handler%E6%8E%A8%E9%80%81message%E5%92%8Crunnable%E7%9A%84%E5%8C%BA%E5%88%AB)
-  - [API](#api)
-    - [构造函数](#%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0)
-    - [主要方法](#%E4%B8%BB%E8%A6%81%E6%96%B9%E6%B3%95)
-  - [Handler引发的内存泄漏](#handler%E5%BC%95%E5%8F%91%E7%9A%84%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F)
-    - [问题](#%E9%97%AE%E9%A2%98)
-    - [解决方案](#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88)
-  - [HandlerThread](#handlerthread)
-  - [总结](#%E6%80%BB%E7%BB%93)
-  - [HandlerThread](#handlerthread-1)
-    - [创建](#%E5%88%9B%E5%BB%BA)
-    - [getLooper](#getlooper)
-    - [运行](#%E8%BF%90%E8%A1%8C)
-    - [退出](#%E9%80%80%E5%87%BA)
-  - [实战](#%E5%AE%9E%E6%88%98)
-    - [利用HandlerThread](#%E5%88%A9%E7%94%A8handlerthread)
-    - [在子线程中创建Handler对象](#%E5%9C%A8%E5%AD%90%E7%BA%BF%E7%A8%8B%E4%B8%AD%E5%88%9B%E5%BB%BAhandler%E5%AF%B9%E8%B1%A1)
-    - [Handler内存泄漏问题](#handler%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E9%97%AE%E9%A2%98)
-      - [典型错误的使用示例](#%E5%85%B8%E5%9E%8B%E9%94%99%E8%AF%AF%E7%9A%84%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B)
-      - [问题一：](#%E9%97%AE%E9%A2%98%E4%B8%80)
-      - [问题二：](#%E9%97%AE%E9%A2%98%E4%BA%8C)
-      - [解决方案1：](#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%881)
-      - [解决方案2：](#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%882)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 # 【Android Handler 消息机制】
->**相关文章：**
-【Android Handler】
 
 ## 前言
 
