@@ -23,6 +23,13 @@ GitHub中的markdown文件直接写[TOC]是无法生成目录的，可以使用�
   ![](http://upload-images.jianshu.io/upload_images/9028834-a46746c8576a485c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 4. 打开md文件目录
+
+  CMD中输入：
+
+  `d:`
+
+  `cd D:\Develop\Documents\Notes\CSDN笔记\temp`
+
   ![](http://upload-images.jianshu.io/upload_images/9028834-57b58a3b6764e062.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 5. 对当前文件夹中所有文件生成目录

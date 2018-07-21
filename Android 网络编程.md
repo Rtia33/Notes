@@ -3683,7 +3683,7 @@ Call的enqueue方法主要做的就是用OKHttp来请求网络并将返回的Res
 
 下面是简单介绍：
 
-[![](http://img.blog.csdn.net/20180304222830678?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)](http://img.blog.csdn.net/20180304222830678?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+[![](https://img-blog.csdn.net/20180304222804157?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)](http://img.blog.csdn.net/20180304222830678?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
 Github地址
 
@@ -3693,7 +3693,7 @@ Github地址
 *   [Retrofit](https://link.jianshu.com?t=https%3A%2F%2Fgithub.com%2Fsquare%2Fretrofit)
 
 ## 网络请求库- 对比
-[![](http://img.blog.csdn.net/20180304222804157?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)](http://img.blog.csdn.net/20180304222804157?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+[![](http://img.blog.csdn.net/20180304222804157?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)](https://img-blog.csdn.net/20180304222804157?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
 
 **引用：**
 ★★★[Android网络编程（一）HTTP协议原理](http://blog.csdn.net/itachi85/article/details/50982995) 
@@ -3708,6 +3708,10 @@ Github地址
 ★★★[Android网络编程（十）Retrofit2后篇-注解](http://blog.csdn.net/itachi85/article/details/53007262)
 ★★★[Android网络编程（十一）源码解析Retrofit](http://blog.csdn.net/itachi85/article/details/53443647)
 ★★★[Android：主流网络请求开源库的对比（Android-Async-Http、Volley、OkHttp、Retrofit）](https://www.jianshu.com/p/050c6db5af5a)
+
+
+
+
 
 
 

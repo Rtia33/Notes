@@ -25,10 +25,22 @@
   - [异步任务ASYNC TASK](#%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1async-task)
   - [线程安全方法](#%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E6%96%B9%E6%B3%95)
   - [进程间通信](#%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1)
+- [Android 进阶13：几种进程通信方式的对比总结](#android-%E8%BF%9B%E9%98%B613%E5%87%A0%E7%A7%8D%E8%BF%9B%E7%A8%8B%E9%80%9A%E4%BF%A1%E6%96%B9%E5%BC%8F%E7%9A%84%E5%AF%B9%E6%AF%94%E6%80%BB%E7%BB%93)
+  - [RPC 是什么](#rpc-%E6%98%AF%E4%BB%80%E4%B9%88)
+  - [IDL 是什么](#idl-%E6%98%AF%E4%BB%80%E4%B9%88)
+  - [IPC 是什么](#ipc-%E6%98%AF%E4%BB%80%E4%B9%88)
+  - [Android 几种进程通信方式](#android-%E5%87%A0%E7%A7%8D%E8%BF%9B%E7%A8%8B%E9%80%9A%E4%BF%A1%E6%96%B9%E5%BC%8F)
+  - [如何选择这几种通信方式](#%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9%E8%BF%99%E5%87%A0%E7%A7%8D%E9%80%9A%E4%BF%A1%E6%96%B9%E5%BC%8F)
+  - [Thanks](#thanks)
+- [进程间通信](#%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1-1)
+      - [Bundle/Intent传递数据：](#bundleintent%E4%BC%A0%E9%80%92%E6%95%B0%E6%8D%AE)
+      - [文件共享：](#%E6%96%87%E4%BB%B6%E5%85%B1%E4%BA%AB)
+      - [Messenger：](#messenger)
+      - [AIDL：](#aidl)
+      - [ContentProvider：](#contentprovider)
+      - [Socket：](#socket)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-
 
 # 【Android 进程和线程】
 >相关文章：[JAVA 线程](http://blog.csdn.net/moira33/article/details/78894952)
@@ -336,7 +348,168 @@ Android系统提供了远程调用RPC机制来完成进程通信IPC，通过RPC�
 
 
 
+===============RTRT===================
 
+# Android 进阶13：几种进程通信方式的对比总结
+
+https://blog.csdn.net/u011240877/article/details/72863432
+
+2017年06月05日 01:16:48
+
+阅读数：11485
+
+- 不花时间打基础，你将会花更多时间解决那些不必要的问题。
+
+读完本文你将了解：
+
+- - [RPC 是什么](https://blog.csdn.net/u011240877/article/details/72863432#rpc-%E6%98%AF%E4%BB%80%E4%B9%88)
+  - [IDL 是什么](https://blog.csdn.net/u011240877/article/details/72863432#idl-%E6%98%AF%E4%BB%80%E4%B9%88)
+  - [IPC 是什么](https://blog.csdn.net/u011240877/article/details/72863432#ipc-%E6%98%AF%E4%BB%80%E4%B9%88)
+  - [Android 几种进程通信方式](https://blog.csdn.net/u011240877/article/details/72863432#android-%E5%87%A0%E7%A7%8D%E8%BF%9B%E7%A8%8B%E9%80%9A%E4%BF%A1%E6%96%B9%E5%BC%8F)
+  - [如何选择这几种通信方式](https://blog.csdn.net/u011240877/article/details/72863432#%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9%E8%BF%99%E5%87%A0%E7%A7%8D%E9%80%9A%E4%BF%A1%E6%96%B9%E5%BC%8F)
+  - [Thanks](https://blog.csdn.net/u011240877/article/details/72863432#thanks)
+
+## RPC 是什么
+
+RPC 即 Remote Procedure Call (远程过程调用) 是一种计算机通讯协议，它为我们定义了计算机 C 中的程序如何调用另外一台计算机 S 的程序，让程序员不需要操心底层网络协议，使得开发包括网络分布式多程序在内的应用程序更加容易。
+
+RPC 是典型的 **Client/Server 模式**，由客户端对服务器发出若干请求，服务器收到后根据客户端提供的参数进行操作，然后将执行结果返回给客户端。
+
+RPC 位于 OSI 模型中的会话层： 
+![这里写图片描述](https://img-blog.csdn.net/20170605011422655?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTI0MDg3Nw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+在面向对象编程中，它也被叫做 “远程方法调用”。
+
+## IDL 是什么
+
+RPC 只是一种协议，规定了通信的规则。
+
+在实际工作中客户端与服务端会有各种各样的平台，就好像日常开发一样，为了统一处理不同的实现，需要定义一个共同的接口，于是有了 IDL。
+
+IDL 即 Interface Description Language (接口定义语言)。
+
+**它通过一种中立的方式来描述接口，使得在不同平台上运行的对象和用不同语言编写的程序可以相互通信交流**。比如，一个组件用 C++ 写成，另一个组件用 Java 写，仍然可以通信。
+
+![这里写图片描述](https://img-blog.csdn.net/20170605011454327?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTI0MDg3Nw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+## IPC 是什么
+
+IPC 即 Inter-Process Communication (进程间通信)。
+
+Android 基于 Linux，而 Linux 出于安全考虑，不同进程间不能之间操作对方的数据，这叫做“进程隔离”。
+
+“进程隔离”更详细的介绍（节选自：<http://blog.csdn.net/u010132993/article/details/72582655>）：
+
+> 在 Linux 系统中，虚拟内存机制为每个进程分配了线性连续的内存空间，操作系统将这种虚拟内存空间映射到物理内存空间，每个进程有自己的虚拟内存空间，进而不能操作其他进程的内存空间，只有操作系统才有权限操作物理内存空间。 
+> 进程隔离保证了每个进程的内存安全。
+
+但是在大多数情形下，不同进程间的数据通讯是不可避免的，因此操作系统必须提供跨进程通信机制。
+
+## Android 几种进程通信方式
+
+跨进程通信要求把方法调用及其数据分解至操作系统可以识别的程度，并将其从本地进程和地址空间传输至远程进程和地址空间，然后在远程进程中重新组装并执行该调用。
+
+然后，返回值将沿相反方向传输回来。
+
+Android 为我们提供了以下几种进程通信机制（供开发者使用的进程通信 API）对应的文章链接如下：
+
+- 文件
+
+- AIDL （基于 Binder）
+
+
+  ​
+
+  - [Android 进阶：进程通信之 AIDL 的使用](http://blog.csdn.net/u011240877/article/details/72765136)
+  - [Android 进阶：进程通信之 AIDL 解析](http://blog.csdn.net/u011240877/article/details/72825706)
+
+- Binder
+
+
+  ​
+
+  - [Android 进阶：进程通信之 Binder 机制浅析](http://blog.csdn.net/u011240877/article/details/72801425)
+
+- Messenger （基于 Binder）
+
+
+  ​
+
+  - [Android 进阶：进程通信之 Messenger 使用与解析](http://blog.csdn.net/u011240877/article/details/72836178)
+
+- ContentProvider （基于 Binder）
+
+
+  ​
+
+  - [Android 进阶：进程通信之 ContentProvider 内容提供者](http://blog.csdn.net/u011240877/article/details/72848608)
+
+- Socket
+
+
+  ​
+
+  - [Android 进阶：进程通信之 Socket （顺便回顾 TCP UDP）](http://blog.csdn.net/u011240877/article/details/72860483)
+
+在上述通信机制的基础上，我们只需集中精力定义和实现 RPC 编程接口即可。
+
+## 如何选择这几种通信方式
+
+《Android 开发艺术探索》中总结的已经比较全面了：
+
+![这里写图片描述](https://img-blog.csdn.net/20170605011532312?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMTI0MDg3Nw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+这里再对比总结一下：
+
+- 只有允许不同应用的客户端用 IPC 方式调用远程方法，并且想要在服务中**处理多线程**时，才有必要使用 `AIDL`
+- 如果需要调用远程方法，但不需要处理并发 IPC，就应该通过实现一个 `Binder` 创建接口
+- 如果您想执行 IPC，但只是传递数据，不涉及方法调用，也不需要高并发，就使用 `Messenger` 来实现接口
+- 如果需要处理一对多的进程间数据共享（主要是数据的 CRUD），就使用 `ContentProvider`
+- 如果要实现一对多的并发实时通信，就使用 `Socket`
+
+## Thanks
+
+《Android 开发艺术探索》 
+<https://zh.wikipedia.org/wiki/%E9%81%A0%E7%A8%8B%E9%81%8E%E7%A8%8B%E8%AA%BF%E7%94%A8> 
+<https://zh.wikipedia.org/wiki/%E6%8E%A5%E5%8F%A3%E6%8F%8F%E8%BF%B0%E8%AF%AD%E8%A8%80> 
+<http://blog.csdn.net/u010132993/article/details/72582655> 
+<https://developer.android.com/guide/components/processes-and-threads.html>
+
+
+
+# 进程间通信
+
+https://www.cnblogs.com/lizhengxian/p/5075635.html
+
+#### Bundle/Intent传递数据：
+
+可传递基本类型，String，实现了Serializable或Parcellable接口的数据结构。Serializable是Java的序列化方法，Parcellable是Android的序列化方法，前者代码量少（仅一句），但I/O开销较大，一般用于输出到磁盘或网卡；后者实现代码多，效率高，一般用户内存间序列化和反序列化传输。
+
+#### 文件共享：
+
+对同一个文件先后写读，从而实现传输，Linux机制下，可以对文件并发写，所以要注意同步。顺便一提，Windows下不支持并发读或写。
+
+#### Messenger：
+
+Messenger是基于AIDL实现的，服务端（被动方）提供一个Service来处理客户端（主动方）连接，维护一个Handler来创建Messenger，在onBind时返回Messenger的binder。
+
+双方用Messenger来发送数据，用Handler来处理数据。Messenger处理数据依靠Handler，所以是串行的，也就是说，Handler接到多个message时，就要排队依次处理。
+
+#### AIDL：
+
+AIDL通过定义服务端暴露的接口，以提供给客户端来调用，AIDL使服务器可以并行处理，而Messenger封装了AIDL之后只能串行运行，所以Messenger一般用作消息传递。
+
+通过编写aidl文件来设计想要暴露的接口，编译后会自动生成响应的java文件，服务器将接口的具体实现写在Stub中，用iBinder对象传递给客户端，客户端bindService的时候，用asInterface的形式将iBinder还原成接口，再调用其中的方法。
+
+#### ContentProvider：
+
+系统四大组件之一，底层也是Binder实现，主要用来为其他APP提供数据，可以说天生就是为进程通信而生的。自己实现一个ContentProvider需要实现6个方法，其中onCreate是主线程中回调的，其他方法是运行在Binder之中的。自定义的ContentProvider注册时要提供authorities属性，应用需要访问的时候将属性包装成Uri.parse("content://authorities")。还可以设置permission，readPermission，writePermission来设置权限。 ContentProvider有query，delete，insert等方法，看起来貌似是一个数据库管理类，但其实可以用文件，内存数据等等一切来充当数据源，query返回的是一个Cursor，可以自定义继承AbstractCursor的类来实现。
+
+#### Socket：
+
+学过计算机网络的对Socket不陌生，所以不需要详细讲述。只需要注意，Android不允许在主线程中请求网络，而且请求网络必须要注意声明相应的permission。然后，在服务器中定义ServerSocket来监听端口，客户端使用Socket来请求端口，连通后就可以进行通信。
+
+===============RTRT===================
 
 
 引用：
