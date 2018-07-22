@@ -4,22 +4,88 @@
 
 - [【Android 库 Glide】](#android-%E5%BA%93-glide)
 - [引用](#%E5%BC%95%E7%94%A8)
-- [Glide的基本用法](#glide%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95)
-  - [简介](#%E7%AE%80%E4%BB%8B)
-  - [加载图片](#%E5%8A%A0%E8%BD%BD%E5%9B%BE%E7%89%87)
+- [Glide的使用](#glide%E7%9A%84%E4%BD%BF%E7%94%A8)
+  - [入门教程](#%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B)
+    - [1.添加依赖](#1%E6%B7%BB%E5%8A%A0%E4%BE%9D%E8%B5%96)
+    - [2.添加网络权限](#2%E6%B7%BB%E5%8A%A0%E7%BD%91%E7%BB%9C%E6%9D%83%E9%99%90)
+    - [3.使用](#3%E4%BD%BF%E7%94%A8)
     - [解析](#%E8%A7%A3%E6%9E%90)
       - [with](#with)
       - [load](#load)
       - [into](#into)
-  - [占位图](#%E5%8D%A0%E4%BD%8D%E5%9B%BE)
-      - [placeholder](#placeholder)
-      - [diskCacheStrategy](#diskcachestrategy)
-      - [error](#error)
-  - [指定图片格式](#%E6%8C%87%E5%AE%9A%E5%9B%BE%E7%89%87%E6%A0%BC%E5%BC%8F)
-      - [asBitmap](#asbitmap)
-      - [asGif](#asgif)
-  - [指定图片大小](#%E6%8C%87%E5%AE%9A%E5%9B%BE%E7%89%87%E5%A4%A7%E5%B0%8F)
-      - [override](#override)
+  - [占位图以及加载动画](#%E5%8D%A0%E4%BD%8D%E5%9B%BE%E4%BB%A5%E5%8F%8A%E5%8A%A0%E8%BD%BD%E5%8A%A8%E7%94%BB)
+    - [设置占位图(placeholder)](#%E8%AE%BE%E7%BD%AE%E5%8D%A0%E4%BD%8D%E5%9B%BEplaceholder)
+    - [设置错误图片(error)](#%E8%AE%BE%E7%BD%AE%E9%94%99%E8%AF%AF%E5%9B%BE%E7%89%87error)
+    - [设置动画(crossFade)](#%E8%AE%BE%E7%BD%AE%E5%8A%A8%E7%94%BBcrossfade)
+    - [取消动画(dontAnimate)](#%E5%8F%96%E6%B6%88%E5%8A%A8%E7%94%BBdontanimate)
+  - [加载本地图片](#%E5%8A%A0%E8%BD%BD%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87)
+    - [1.在清单文件中增加权限](#1%E5%9C%A8%E6%B8%85%E5%8D%95%E6%96%87%E4%BB%B6%E4%B8%AD%E5%A2%9E%E5%8A%A0%E6%9D%83%E9%99%90)
+    - [2.加载](#2%E5%8A%A0%E8%BD%BD)
+  - [加载gif](#%E5%8A%A0%E8%BD%BDgif)
+    - [简单加载](#%E7%AE%80%E5%8D%95%E5%8A%A0%E8%BD%BD)
+    - [把gif当作普通图片加载(asBitmap)](#%E6%8A%8Agif%E5%BD%93%E4%BD%9C%E6%99%AE%E9%80%9A%E5%9B%BE%E7%89%87%E5%8A%A0%E8%BD%BDasbitmap)
+    - [检查是否gif(asGif)](#%E6%A3%80%E6%9F%A5%E6%98%AF%E5%90%A6gifasgif)
+    - [加载本地视频缩略图](#%E5%8A%A0%E8%BD%BD%E6%9C%AC%E5%9C%B0%E8%A7%86%E9%A2%91%E7%BC%A9%E7%95%A5%E5%9B%BE)
+    - [其他](#%E5%85%B6%E4%BB%96)
+  - [绑定生命周期](#%E7%BB%91%E5%AE%9A%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F)
+    - [with](#with-1)
+  - [内存缓存与磁盘缓存](#%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98%E4%B8%8E%E7%A3%81%E7%9B%98%E7%BC%93%E5%AD%98)
+    - [缓存的资源](#%E7%BC%93%E5%AD%98%E7%9A%84%E8%B5%84%E6%BA%90)
+    - [内存缓存策略(skipMemoryCache)](#%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98%E7%AD%96%E7%95%A5skipmemorycache)
+    - [磁盘缓存策略(diskCacheStrategy)](#%E7%A3%81%E7%9B%98%E7%BC%93%E5%AD%98%E7%AD%96%E7%95%A5diskcachestrategy)
+    - [组合策略](#%E7%BB%84%E5%90%88%E7%AD%96%E7%95%A5)
+    - [缓存大小及路径](#%E7%BC%93%E5%AD%98%E5%A4%A7%E5%B0%8F%E5%8F%8A%E8%B7%AF%E5%BE%84)
+      - [内存缓存最大空间](#%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98%E6%9C%80%E5%A4%A7%E7%A9%BA%E9%97%B4)
+      - [磁盘缓存大小](#%E7%A3%81%E7%9B%98%E7%BC%93%E5%AD%98%E5%A4%A7%E5%B0%8F)
+      - [磁盘缓存目录](#%E7%A3%81%E7%9B%98%E7%BC%93%E5%AD%98%E7%9B%AE%E5%BD%95)
+    - [清除缓存](#%E6%B8%85%E9%99%A4%E7%BC%93%E5%AD%98)
+      - [清除所有缓存](#%E6%B8%85%E9%99%A4%E6%89%80%E6%9C%89%E7%BC%93%E5%AD%98)
+      - [清除单个缓存](#%E6%B8%85%E9%99%A4%E5%8D%95%E4%B8%AA%E7%BC%93%E5%AD%98)
+  - [通过GlideModule定制Glide](#%E9%80%9A%E8%BF%87glidemodule%E5%AE%9A%E5%88%B6glide)
+    - [1.创建一个类实现GlideModule](#1%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E7%B1%BB%E5%AE%9E%E7%8E%B0glidemodule)
+    - [2.配置清单文件](#2%E9%85%8D%E7%BD%AE%E6%B8%85%E5%8D%95%E6%96%87%E4%BB%B6)
+    - [3.进行自定义配置](#3%E8%BF%9B%E8%A1%8C%E8%87%AA%E5%AE%9A%E4%B9%89%E9%85%8D%E7%BD%AE)
+    - [例子(配置默认图片质量)](#%E4%BE%8B%E5%AD%90%E9%85%8D%E7%BD%AE%E9%BB%98%E8%AE%A4%E5%9B%BE%E7%89%87%E8%B4%A8%E9%87%8F)
+    - [可以配置多个GlideModule](#%E5%8F%AF%E4%BB%A5%E9%85%8D%E7%BD%AE%E5%A4%9A%E4%B8%AAglidemodule)
+    - [自定义内存缓存](#%E8%87%AA%E5%AE%9A%E4%B9%89%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98)
+    - [自定义磁盘缓存](#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A3%81%E7%9B%98%E7%BC%93%E5%AD%98)
+      - [私有缓存](#%E7%A7%81%E6%9C%89%E7%BC%93%E5%AD%98)
+      - [外部缓存](#%E5%A4%96%E9%83%A8%E7%BC%93%E5%AD%98)
+      - [完全自定义路径](#%E5%AE%8C%E5%85%A8%E8%87%AA%E5%AE%9A%E4%B9%89%E8%B7%AF%E5%BE%84)
+  - [图片的压缩](#%E5%9B%BE%E7%89%87%E7%9A%84%E5%8E%8B%E7%BC%A9)
+    - [Android图片显示相关知识](#android%E5%9B%BE%E7%89%87%E6%98%BE%E7%A4%BA%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86)
+      - [图片质量分类](#%E5%9B%BE%E7%89%87%E8%B4%A8%E9%87%8F%E5%88%86%E7%B1%BB)
+      - [图片默认质量](#%E5%9B%BE%E7%89%87%E9%BB%98%E8%AE%A4%E8%B4%A8%E9%87%8F)
+      - [占用内存](#%E5%8D%A0%E7%94%A8%E5%86%85%E5%AD%98)
+    - [图片质量的压缩或者提高](#%E5%9B%BE%E7%89%87%E8%B4%A8%E9%87%8F%E7%9A%84%E5%8E%8B%E7%BC%A9%E6%88%96%E8%80%85%E6%8F%90%E9%AB%98)
+    - [指定图片大小(override)](#%E6%8C%87%E5%AE%9A%E5%9B%BE%E7%89%87%E5%A4%A7%E5%B0%8Foverride)
+  - [图片预处理(圆角，高斯模糊等)](#%E5%9B%BE%E7%89%87%E9%A2%84%E5%A4%84%E7%90%86%E5%9C%86%E8%A7%92%E9%AB%98%E6%96%AF%E6%A8%A1%E7%B3%8A%E7%AD%89)
+    - [1.创建一个类继承BitmapTransformation](#1%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E7%B1%BB%E7%BB%A7%E6%89%BFbitmaptransformation)
+    - [2.使用](#2%E4%BD%BF%E7%94%A8)
+    - [举例(圆角处理)](#%E4%B8%BE%E4%BE%8B%E5%9C%86%E8%A7%92%E5%A4%84%E7%90%86)
+      - [1 自定义Transformation](#1-%E8%87%AA%E5%AE%9A%E4%B9%89transformation)
+        - [2 使用](#2-%E4%BD%BF%E7%94%A8)
+    - [使用多个transform](#%E4%BD%BF%E7%94%A8%E5%A4%9A%E4%B8%AAtransform)
+    - [三方库](#%E4%B8%89%E6%96%B9%E5%BA%93)
+  - [图片的剪裁(ScaleType)](#%E5%9B%BE%E7%89%87%E7%9A%84%E5%89%AA%E8%A3%81scaletype)
+    - [ImageView的ScaleType](#imageview%E7%9A%84scaletype)
+      - [效果图](#%E6%95%88%E6%9E%9C%E5%9B%BE)
+      - [属性介绍](#%E5%B1%9E%E6%80%A7%E4%BB%8B%E7%BB%8D)
+        - [(1)matrix](#1matrix)
+        - [(2)center](#2center)
+        - [(3)centerInside](#3centerinside)
+        - [(4)centerCrop](#4centercrop)
+        - [(5)fitCenter(默认)](#5fitcenter%E9%BB%98%E8%AE%A4)
+        - [(6)fitStart](#6fitstart)
+        - [(7)fitEnd](#7fitend)
+        - [(8)fitXY](#8fitxy)
+      - [默认是FIT_CENTER](#%E9%BB%98%E8%AE%A4%E6%98%AFfit_center)
+    - [Glide配置](#glide%E9%85%8D%E7%BD%AE)
+      - [默认策略](#%E9%BB%98%E8%AE%A4%E7%AD%96%E7%95%A5)
+      - [fitCenter](#fitcenter)
+      - [centerCrop](#centercrop)
+      - [效果图对比](#%E6%95%88%E6%9E%9C%E5%9B%BE%E5%AF%B9%E6%AF%94)
+      - [注意](#%E6%B3%A8%E6%84%8F)
 - [从源码的角度理解Glide的执行流程](#%E4%BB%8E%E6%BA%90%E7%A0%81%E7%9A%84%E8%A7%92%E5%BA%A6%E7%90%86%E8%A7%A3glide%E7%9A%84%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B)
   - [如何阅读源码](#%E5%A6%82%E4%BD%95%E9%98%85%E8%AF%BB%E6%BA%90%E7%A0%81)
   - [源码下载](#%E6%BA%90%E7%A0%81%E4%B8%8B%E8%BD%BD)
@@ -66,12 +132,6 @@
   - [内存缓存](#%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98)
     - [禁用内存缓存](#%E7%A6%81%E7%94%A8%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98)
     - [内存缓存源码分析](#%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
-      - [内存缓存图解](#%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98%E5%9B%BE%E8%A7%A3)
-        - [Engine的创建图解](#engine%E7%9A%84%E5%88%9B%E5%BB%BA%E5%9B%BE%E8%A7%A3)
-        - [读取内存缓存图解](#%E8%AF%BB%E5%8F%96%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98%E5%9B%BE%E8%A7%A3)
-        - [写入内存缓存图解](#%E5%86%99%E5%85%A5%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98%E5%9B%BE%E8%A7%A3)
-        - [读取硬盘缓存图解](#%E8%AF%BB%E5%8F%96%E7%A1%AC%E7%9B%98%E7%BC%93%E5%AD%98%E5%9B%BE%E8%A7%A3)
-        - [写入硬盘缓存图解](#%E5%86%99%E5%85%A5%E7%A1%AC%E7%9B%98%E7%BC%93%E5%AD%98%E5%9B%BE%E8%A7%A3)
       - [Glide.buildStreamModelLoader()](#glidebuildstreammodelloader)
       - [glideBuilder.createGlide()](#glidebuildercreateglide)
       - [内存缓存读取](#%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98%E8%AF%BB%E5%8F%96)
@@ -79,7 +139,7 @@
       - [弱引用缓存写入](#%E5%BC%B1%E5%BC%95%E7%94%A8%E7%BC%93%E5%AD%98%E5%86%99%E5%85%A5)
       - [LruCache缓存写入](#lrucache%E7%BC%93%E5%AD%98%E5%86%99%E5%85%A5)
   - [硬盘缓存](#%E7%A1%AC%E7%9B%98%E7%BC%93%E5%AD%98)
-    - [diskCacheStrategy](#diskcachestrategy-1)
+    - [diskCacheStrategy](#diskcachestrategy)
     - [硬盘缓存源码分析](#%E7%A1%AC%E7%9B%98%E7%BC%93%E5%AD%98%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
       - [读取](#%E8%AF%BB%E5%8F%96)
       - [EngineRunnable.decodeFromCache()](#enginerunnabledecodefromcache)
@@ -87,8 +147,13 @@
       - [写入](#%E5%86%99%E5%85%A5)
       - [EngineRunnable.decodeFromSource()](#enginerunnabledecodefromsource)
       - [DecodeJob.decodeSource()](#decodejobdecodesource)
+      - [缓存图解](#%E7%BC%93%E5%AD%98%E5%9B%BE%E8%A7%A3)
+        - [Engine的创建图解](#engine%E7%9A%84%E5%88%9B%E5%BB%BA%E5%9B%BE%E8%A7%A3)
+        - [读取内存缓存图解](#%E8%AF%BB%E5%8F%96%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98%E5%9B%BE%E8%A7%A3)
+        - [写入内存缓存图解](#%E5%86%99%E5%85%A5%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98%E5%9B%BE%E8%A7%A3)
+        - [读取硬盘缓存图解](#%E8%AF%BB%E5%8F%96%E7%A1%AC%E7%9B%98%E7%BC%93%E5%AD%98%E5%9B%BE%E8%A7%A3)
+        - [写入硬盘缓存图解](#%E5%86%99%E5%85%A5%E7%A1%AC%E7%9B%98%E7%BC%93%E5%AD%98%E5%9B%BE%E8%A7%A3)
   - [高级技巧](#%E9%AB%98%E7%BA%A7%E6%8A%80%E5%B7%A7)
-- [引用](#%E5%BC%95%E7%94%A8-1)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -97,15 +162,27 @@
 # 【Android 库 Glide】
 
 # 引用
-
- [Android图片加载框架最全解析（一），Glide的基本用法](http://blog.csdn.net/guolin_blog/article/details/53759439)
- [Android图片加载框架最全解析（二），从源码的角度理解Glide的执行流程](http://blog.csdn.net/guolin_blog/article/details/53939176)
- [Android图片加载框架最全解析（三），深入探究Glide的缓存机制](http://blog.csdn.net/guolin_blog/article/details/54895665)
+[Android图片加载框架最全解析（一），Glide的基本用法](http://blog.csdn.net/guolin_blog/article/details/53759439)
+[Android图片加载框架最全解析（二），从源码的角度理解Glide的执行流程](http://blog.csdn.net/guolin_blog/article/details/53939176)
+[Android图片加载框架最全解析（三），深入探究Glide的缓存机制](http://blog.csdn.net/guolin_blog/article/details/54895665)
 [Android图片加载框架最全解析（四），玩转Glide的回调与监听](http://blog.csdn.net/guolin_blog/article/details/70215985)
- [Android图片加载框架最全解析（五），Glide强大的图片变换功能](http://blog.csdn.net/guolin_blog/article/details/71524668)
- [Android图片加载框架最全解析（六），探究Glide的自定义模块功能](http://blog.csdn.net/guolin_blog/article/details/78179422)
+[Android图片加载框架最全解析（五），Glide强大的图片变换功能](http://blog.csdn.net/guolin_blog/article/details/71524668)
+[Android图片加载框架最全解析（六），探究Glide的自定义模块功能](http://blog.csdn.net/guolin_blog/article/details/78179422)
 [Android图片加载框架最全解析（七），实现带进度的Glide图片加载功能](http://blog.csdn.net/guolin_blog/article/details/78357251)
 [Android图片加载框架最全解析（八），带你全面了解Glide 4的用法](http://blog.csdn.net/guolin_blog/article/details/78582548)
+
+[1.Glide-入门教程](http://blog.csdn.net/yulyu/article/details/55053099)
+[2.Glide-占位图以及加载动画](http://blog.csdn.net/yulyu/article/details/55054747)
+[3.Glide-加载本地图片](http://blog.csdn.net/yulyu/article/details/55056352)
+[4.Glide-加载Gif](http://blog.csdn.net/yulyu/article/details/55095407)
+[5.Glide-绑定生命周期](http://blog.csdn.net/yulyu/article/details/55096684)
+[6.Glide-内存缓存与磁盘缓存](http://blog.csdn.net/yulyu/article/details/55096713)
+[7.Glide-通过Modules定制Glide](http://blog.csdn.net/yulyu/article/details/55194237)
+[8.Glide-自定义缓存](http://blog.csdn.net/yulyu/article/details/55211250)
+[9.Glide-图片的压缩](http://blog.csdn.net/yulyu/article/details/55215718)
+[10.Glide-图片预处理(圆角,高斯模糊等)](http://blog.csdn.net/yulyu/article/details/55261351)
+[11.Glide-图片的剪裁(ScaleType)](http://blog.csdn.net/yulyu/article/details/55261439)
+[12.Glide-源码详解](http://blog.csdn.net/yulyu/article/details/60331803)
 
 现在Android上的图片加载框架非常成熟，从最早的老牌图片加载框架UniversalImageLoader，到后来Google推出的Volley，再到后来的新兴军Glide和Picasso，当然还有Facebook的Fresco。每一个都非常稳定，功能也都十分强大。但是它们的使用场景基本都是重合的，也就是说我们基本只需要选择其中一个来进行学习和使用就足够了，每一个框架都尝试去掌握的话则有些浪费时间。
 
@@ -113,51 +190,39 @@
 
 那么再拿Glide和Picasso对比呢，首先这两个框架的用法非常相似，但其实它们各有特色。Picasso比Glide更加简洁和轻量，Glide比Picasso功能更为丰富。之前已经有人对这两个框架进行过全方面的对比，大家如果想了解更多的话可以去参考一下 [Google推荐的图片加载库Glide介绍](http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2015/0327/2650.html) 。
 
-# Glide的基本用法
-
-## 简介
-
+# Glide的使用
 Glide是一款由Bump Technologies开发的图片加载框架，使得我们可以在Android平台上以极度简单的方式加载和展示图片。
+本文基于Glide 3.7.0版本来进行讲解。
 
-本文寄语Glide 3.7.0版本来进行讲解。
+## 入门教程
 
-要想使用Glide，首先需要将这个库引入到我们的项目当中。新建一个GlideTest项目，然后在app/build.gradle文件当中添加如下依赖：
+### 1.添加依赖
+```
+compile 'com.github.bumptech.glide:glide:3.7.0'
+```
+如果你还在使用Eclipse，可以点击 [这里](http://download.csdn.net/detail/sinyu890807/9781538) 下载Glide的jar包。
 
+### 2.添加网络权限
+```
+<uses-permission android:name="android.permission.INTERNET"/>
+```
+
+### 3.使用
+`Glide.with(MainActivity.this).load(url).into(iv);`
 ```java
-dependencies {
-    compile 'com.github.bumptech.glide:glide:3.7.0'
+public class MainActivity extends AppCompatActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        ImageView  iv = (ImageView)findViewById(R.id.iv);
+        String   url = "https://img.gcall.com/dca5/M00/10/8E/wKhoNlggetaENWylAAAAAAAAAAA457.jpg";
+        //加载图片
+        Glide.with(MainActivity.this).load(url).into(iv);
+    }
 }
 ```
 
-如果你还在使用Eclipse，可以点击 [这里](http://download.csdn.net/detail/sinyu890807/9781538) 下载Glide的jar包。
-
-另外，Glide中需要用到网络功能，因此你还得在AndroidManifest.xml中声明一下网络权限才行：
-
-```xml
-<uses-permission android:name="android.permission.INTERNET" />
-```
-
-就是这么简单，然后我们就可以自由地使用Glide中的任意功能了。
-
-## 加载图片
-
-现在我们就来尝试一下如何使用Glide来加载图片吧：
-
-```java
-String url = "http://cn.bing.com/az/hprichbg/rb/Dongdaemun_ZH-CN10736487148_1920x1080.jpg";
-Glide.with(this).load(url).into(imageView);
-```
-
-没错，就是这么简单。现在我们来运行一下程序，效果如下图所示：
-[![](https://upload-images.jianshu.io/upload_images/9028834-5ff3c4df2889eedb.gif?imageMogr2/auto-orient/strip)](https://upload-images.jianshu.io/upload_images/9028834-5ff3c4df2889eedb.gif?imageMogr2/auto-orient/strip)
-
-核心的代码就只有这一行而已：
-
-```java
-Glide.with(this).load(url).into(imageView);
-```
-
-这一行代码，可以**加载网络**上的**图片**、加载手机**本地**的**图片**、加载应用**资源中**的**图片**等等。
 
 ### 解析
 
@@ -201,141 +266,503 @@ Glide.with(this).load(imageUri).into(imageView);
 
 那么回顾一下Glide最基本的使用方式，其实就是关键的三步走：先with()，再load()，最后into()。熟记这三步，你就已经入门Glide了。
 
-## 占位图
+## 占位图以及加载动画
 
-现在我们来学一些Glide的扩展内容。其实刚才所学的三步走就是Glide最核心的东西，而我们后面所要学习的所有东西都是在这个三步走的基础上不断进行扩展而已。
+### 设置占位图(placeholder)
+有时候加载的图片过大时,或者网络不好时,我们经常希望控件在加载过程中有一张默认的占位图
+```java
+Glide.with(this).load(url)
+	.placeholder(R.mipmap.place)
+	.into(iv);
+```
 
-观察刚才加载网络图片的效果，你会发现，点击了Load Image按钮之后，要稍微等一会图片才会显示出来。这其实很容易理解，因为从网络上下载图片本来就是需要时间的。那么我们有没有办法再优化一下用户体验呢？当然可以，Glide提供了各种各样非常丰富的API支持，其中就包括了占位图功能。
+### 设置错误图片(error)
+当图片链接地址有误或者网络不行的时候,我们需要显示一个错误图片
+```java
+Glide.with(this).load(url).placeholder(R.mipmap.place)
+	.error(R.mipmap.icon_photo_error)
+	.into(iv);
+```
 
-顾名思义，占位图就是指在图片的加载过程中，我们先显示一张临时的图片，等图片加载出来了再替换成要加载的图片。
+### 设置动画(crossFade)
+Glide默认是包含淡入淡出动画的时间为300ms(毫秒)，我们可以修改这个动画的时间
+```java
+Glide.with(this).load(url).placeholder(R.mipmap.place).error(R.mipmap.icon_photo_error)
+	.crossFade(5000)
+	.into(iv);
+```
 
-#### placeholder
+### 取消动画(dontAnimate)
 
-下面我们就来学习一下Glide占位图功能的使用方法，首先我事先准备好了一张loading.jpg图片，用来作为占位图显示。然后修改Glide加载部分的代码，如下所示：
+当我们不希望有淡入淡出动画时
 
 ```java
-Glide.with(this)
-     .load(url)
-     .placeholder(R.drawable.loading)
-     .into(imageView);
+Glide.with(this).load(url).placeholder(R.mipmap.place).error(R.mipmap.icon_photo_error)
+	.dontAnimate()
+	.into(iv);
 ```
 
-没错，就是这么简单。我们只是在刚才的三步走之间插入了一个placeholder()方法，然后将占位图片的资源id传入到这个方法中即可。
-另外，这个占位图的用法其实也演示了**Glide当中绝大多数API的用法**，其实就是**在load()和into()方法之间串接**任意想添加的功能就可以了。
+## 加载本地图片
 
-#### diskCacheStrategy
+### 1.在清单文件中增加权限
 
-不过如果你现在重新运行一下代码并点击Load Image，很可能是根本看不到占位图效果的。因为Glide有非常强大的缓存机制，我们刚才加载那张必应美图的时候Glide自动就已经将它缓存下来了，下次加载的时候将会直接从缓存中读取，不会再去网络下载了，因而加载的速度非常快，所以占位图可能根本来不及显示。
+```
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+```
 
-因此这里我们还需要稍微做一点修改，来让占位图能有机会显示出来，修改代码如下所示：
+### 2.加载
+
+其实Glide加载本地图片和加载网络图片调用的方法是一样的,唯一的区别是说加载SD卡的图片需要SD卡的权限,加载网络需要网络权限
 
 ```java
-Glide.with(this)
-     .load(url)
-     .placeholder(R.drawable.loading)
-     .diskCacheStrategy(DiskCacheStrategy.NONE)
-     .into(imageView);
+    //本地文件
+    File file = new File(Environment.getExternalStorageDirectory(), "xiayu.png");
+    //加载图片
+    Glide.with(this).load(file).into(iv);
 ```
 
-可以看到，这里串接了一个diskCacheStrategy()方法，并传入DiskCacheStrategy.NONE参数，这样就可以禁用掉Glide的缓存功能。
+## 加载gif
 
-关于Glide缓存方面的内容我们将会在后面的文章进行详细的讲解，这里只是为了测试占位图功能而加的一个额外配置，暂时你只需要知道禁用缓存必须这么写就可以了。
+### 简单加载
+如果只是简单加载gif，其实**跟加载普通图片一样**，Glide会自行判断
+```java
+Glide.with(this).load(mGifUrl).placeholder(R.mipmap.place).error(R.mipmap.icon_photo_error).into(mIv);
+```
 
-现在重新运行一下代码，效果如下图所示：
-[![](https://upload-images.jianshu.io/upload_images/9028834-99c5707725b51853.gif?imageMogr2/auto-orient/strip)](https://upload-images.jianshu.io/upload_images/9028834-99c5707725b51853.gif?imageMogr2/auto-orient/strip)
-
-可以看到，当点击Load Image按钮之后会立即显示一张占位图，然后等真正的图片加载完成之后会将占位图替换掉。
-
-#### error
-
-当然，这只是占位图的一种，除了这种加载占位图之外，还有一种异常占位图。**异常占位图**就是指，如果因为某些异常情况导致图片加载失败，比如说手机网络信号不好，这个时候就显示这张异常占位图。
-
-异常占位图的用法相信你已经可以猜到了，首先准备一张error.jpg图片，然后修改Glide加载部分的代码，如下所示：
+### 把gif当作普通图片加载(asBitmap)
+如果希望加载gif时**只加载gif的第一帧**，把gif当作普通图片一样加载，那么只需要加上asBitmap方法即可
 
 ```java
-Glide.with(this)
-     .load(url)
-     .placeholder(R.drawable.loading)
-     .error(R.drawable.error)
-     .diskCacheStrategy(DiskCacheStrategy.NONE)
-     .into(imageView);
+Glide.with(this).load(mGifUrl).asBitmap().placeholder(R.mipmap.place).error(R.mipmap.icon_photo_error).into(mIv);
 ```
 
-很简单，这里又串接了一个error()方法就可以指定异常占位图了。
-
-现在你可以将图片的url地址修改成一个不存在的图片地址，或者干脆直接将手机的网络给关了，然后重新运行程序，效果如下图所示：
-
-[![](https://upload-images.jianshu.io/upload_images/9028834-9528892e031741e8.gif?imageMogr2/auto-orient/strip)](https://upload-images.jianshu.io/upload_images/9028834-9528892e031741e8.gif?imageMogr2/auto-orient/strip)
-
-这样我们就把Glide提供的占位图功能都掌握了。
-
-## 指定图片格式
-
-我们还需要再了解一下Glide另外一个强大的功能，那就是**Glide**是**支持加载GIF**图片的。
-这一点确实非常牛逼，因为相比之下Jake Warton曾经明确表示过，**Picasso**是**不**会**支持加载GIF**图片的。
-
-而使用Glide加载GIF图并不需要编写什么额外的代码，Glide内部会自动判断图片格式。比如这是一张GIF图片的URL地址：
-
-```xml
-http://p1.pstatp.com/large/166200019850062839d3
-```
-
-我们只需要将刚才那段加载图片代码中的URL地址替换成上面的地址就可以了，现在重新运行一下代码，效果如下图所示：
-[![](https://upload-images.jianshu.io/upload_images/9028834-1c8290a0421a78a0.gif?imageMogr2/auto-orient/strip)](https://upload-images.jianshu.io/upload_images/9028834-1c8290a0421a78a0.gif?imageMogr2/auto-orient/strip)
-
-不管我们传入的是一张普通图片，还是一张GIF图片，**Glide**都**会自动进行判断**，并且可以正确地把它解析并展示出来。
-
-#### asBitmap
-
-但是如果我想指定图片的格式该怎么办呢？就比如说，我希望加载的这张图必须是一张静态图片，我不需要Glide自动帮我判断它到底是静图还是GIF图。
-
-想实现这个功能仍然非常简单，我们只需要再串接一个新的方法就可以了，如下所示：
+### 检查是否gif(asGif)
+如果你希望加载的只是gif，如果**不是gif就显示错误图片**，那么只用加上asGif方法即可
 
 ```java
-Glide.with(this)
-     .load(url)
-     .asBitmap()
-     .placeholder(R.drawable.loading)
-     .error(R.drawable.error)
-     .diskCacheStrategy(DiskCacheStrategy.NONE)
-     .into(imageView);
+Glide.with(this).load(mGifUrl)
+	.asGif()
+	.placeholder(R.mipmap.place).error(R.mipmap.icon_photo_error).into(mIv);
 ```
 
-可以看到，这里在load()方法的后面加入了一个asBitmap()方法，这个方法的意思就是说这里只允许加载静态图片，不需要Glide去帮我们自动进行图片格式的判断了。
-
-现在重新运行一下程序，效果如下图所示：
-
-[![4.gif](https://upload-images.jianshu.io/upload_images/9028834-8048d1578891f81f.gif?imageMogr2/auto-orient/strip)](https://upload-images.jianshu.io/upload_images/9028834-8048d1578891f81f.gif?imageMogr2/auto-orient/strip)
-
-由于调用了asBitmap()方法，现在GIF图就无法正常播放了，而是会在界面上**显示第一帧**的图片。
-
-#### asGif
-
-那么类似地，既然我们能强制指定加载静态图片，就也能强制指定加载动态图片。比如说我们想要实现必须加载动态图片的功能，就可以这样写：
-
-```java
-Glide.with(this)
-     .load(url)
-     .asGif()
-     .placeholder(R.drawable.loading)
-     .error(R.drawable.error)
-     .diskCacheStrategy(DiskCacheStrategy.NONE)
-     .into(imageView);
+### 加载本地视频缩略图
+网络上很多文章上都是从一篇译文里面拷贝过来的，里面说Glide可以加载本地视频,但是那篇译文漏翻译一句了，Glide只会**加载本地视频的第一帧**，也就是缩略图，而且其实加载缩略图的时候也无需转化为Uri，**直接把File丢进去**就行了
+``` java
+mVideoFile = new File(Environment.getExternalStorageDirectory(), "xiayu.mp4");
+Glide.with(this).load(mVideoFile).placeholder(R.mipmap.place).error(R.mipmap.icon_photo_error).into(mIv);
 ```
 
-这里调用了asGif()方法替代了asBitmap()方法，很好理解，相信不用我多做什么解释了。
+### 其他
+在大多数情况下，当你使用diskCacheStrategy（DiskCacheStrategy.**SOURCE**）时，Gif的**加载速度**会显**着提高**(其实就是把gif资源缓存到磁盘)
 
-那么既然指定了只允许加载动态图片，如果我们传入了一张静态图片的URL地址又会怎么样呢？试一下就知道了，将图片的URL地址改成刚才的必应美图，然后重新运行代码，效果如下图所示。
+``` java
+Glide.with(this).load(mGifUrl)
+	.diskCacheStrategy(DiskCacheStrategy.SOURCE)
+	.placeholder(R.mipmap.place).error(R.mipmap.icon_photo_error).into(mIv);
+```
 
-[![5.gif](https://upload-images.jianshu.io/upload_images/9028834-ba594b935152d646.gif?imageMogr2/auto-orient/strip)](https://upload-images.jianshu.io/upload_images/9028834-ba594b935152d646.gif?imageMogr2/auto-orient/strip)
+## 绑定生命周期
 
-没错，如果**指定**了只能加载**动态**图片，而**传入**的图片却是一张**静图**的话，那么结果自然就只有**加载失败**喽。
+### with
 
-## 指定图片大小
+其实Glide与activity和fragment绑定生命周期很简单，只用在**with**的时候**传入想绑定生命周期的Context**就行。
+
+比如通常在MainActivity中传入this,或者MainActivity即可
+
+(在Glide内部会根据你Context的实际类型做不同的处理，具体的分析会在以后的源码分析中展示)
+
+``` java
+Glide.with(this).load(mUrl).into(mIv);
+```
+
+## 内存缓存与磁盘缓存
+
+### 缓存的资源
+
+Glide的缓存资源分为两种:
+
+- 1.原图(SOURCE) :原始图片
+- 2.处理图(RESULT) :经过压缩和变形等处理后的图片
+
+### 内存缓存策略(skipMemoryCache)
+
+Glide**默认**是会在内存中**缓存处理图(RESULT)**的。
+
+可以通过调用**`skipMemoryCache(true)`**来设置**跳过内存缓存**
+
+``` java
+    //跳过内存缓存
+    Glide.with(this).load(mUrl)
+	    .skipMemoryCache(true)
+	    .into(mIv);
+```
+
+调用skipMemoryCache(false)没有代码上的意义，因为Glide默认就是不跳过内存缓存的，但是显示调用这个方法，可以让别人一目了然的知道你这次请求是会在内存中缓存的，所以还是建议显示调用一下这个方法来表明你的内存缓存策略
+
+### 磁盘缓存策略(diskCacheStrategy)
+
+Glide磁盘缓存策略分为四种，默认的是RESULT(默认值这一点网上很多文章都写错了，但是这一点很重要):
+
+- **1.ALL**:缓存原图(SOURCE)和处理图(RESULT)
+- **2.NONE**:什么都不缓存
+- **3.SOURCE**:只缓存原图(SOURCE)
+- **4.RESULT**:只缓存处理图(RESULT) **—默认值**
+
+### 组合策略
+
+和其他三级缓存一样，Glide的缓存读取顺序是 **内存–>磁盘–>网络**
+
+需要注意的是Glide的**内存缓存**和**磁盘缓存**的配置相互没有直接影响，所以可以**同时进行配置**
+
+例:
+
+**1.内存不缓存，磁盘缓存缓存所有图片**
+
+``` java
+Glide.with(this).load(mUrl)
+	.skipMemoryCache(true)
+	.diskCacheStrategy(DiskCacheStrategy.ALL)
+	.into(mIv);
+```
+
+**2.内存缓存处理图，磁盘缓存原图**
+
+``` java
+Glide.with(this).load(mUrl)
+	.skipMemoryCache(false)
+	.diskCacheStrategy(DiskCacheStrategy.SOURCE)
+	.into(mIv);
+```
+
+### 缓存大小及路径
+
+#### 内存缓存最大空间
+
+Glide的内存缓存其实涉及到比较多的计算，这里就介绍最重要的一个参数，就是内存缓存最大空间
+
+内存缓存最大空间(maxSize)=每个进程可用的最大内存 \* 0.4
+
+(低配手机的话是: 每个进程可用的最大内存 \* 0.33)
+
+#### 磁盘缓存大小
+
+磁盘缓存大小: 250 \* 1024 * 1024(250MB)
+
+``` java
+/** 250 MB of cache. */
+    int DEFAULT_DISK_CACHE_SIZE = 250 * 1024 * 1024;
+```
+#### 磁盘缓存目录
+
+磁盘缓存目录: 项目/cache/image_manager_disk_cache
+
+``` java
+    String DEFAULT_DISK_CACHE_DIR = "image_manager_disk_cache";
+```
+
+### 清除缓存
+
+#### 清除所有缓存
+
+清除所有内存缓存(需要在Ui线程操作)
+
+``` java
+Glide.get(this).clearMemory();
+```
+
+清除所有磁盘缓存(需要在子线程操作)
+
+``` java
+Glide.get(MainActivity.this).clearDiskCache();
+```
+
+注：在使用中的资源不会被清除
+
+#### 清除单个缓存
+
+由于Glide可能会缓存一张图片的多个分辨率的图片，并且文件名是被哈希过的，所以并不能很好的删除单个资源的缓存，以下是官方文档中的描述
+
+``` java
+Because File names are hashed keys, there is no good way to simply delete all of the cached files on disk that
+correspond to a particular url or file path. The problem would be simpler if you were only ever allowed to load
+or cache the original image, but since Glide also caches thumbnails and provides various transformations, each
+of which will result in a new File in the cache, tracking down and deleting every cached version of an image 
+is difficult.
+
+In practice, the best way to invalidate a cache file is to change your identifier when the content changes 
+(url, uri, file path etc).
+```
+
+## 通过GlideModule定制Glide
+
+### 1.创建一个类实现GlideModule
+
+``` java
+public class XiayuGlideModule implements GlideModule {
+    @Override
+    public void applyOptions(Context context, GlideBuilder builder) {
+       //TODO
+    }
+    @Override
+    public void registerComponents(Context context, Glide glide) {
+       //TODO
+    }
+}
+```
+
+### 2.配置清单文件
+
+在AndroidManifest中配置刚刚创建的GlideModule,需要在application节点下添加
+
+``` xml
+<application>
+    ...
+
+    <meta-data
+        android:name="com.xiayu.xiayuglidedemo.XiayuGlideModule"
+        android:value="GlideModule" />
+</application>
+```
+
+其中android:name就是刚才创建的GlideModule的实现类
+
+### 3.进行自定义配置
+
+刚才创建的GlideModule的实现类时，会要实现两个方法，这里要用到的是其中的**`applyOptions`**方法，applyOptions方法里面提供了一个GlideBuilder，通过GlideBuilder我们就能实现自定义配置了
+
+``` java
+public class XiayuGlideModule implements GlideModule {
+    @Override
+    public void applyOptions(Context context, GlideBuilder builder) {
+        builder.setDiskCache();//自定义磁盘缓存
+
+        builder.setMemoryCache();//自定义内存缓存
+
+        builder.setBitmapPool(); //自定义图片池
+
+        builder.setDiskCacheService();//自定义本地缓存的线程池
+
+        builder.setResizeService();//自定义核心处理的线程池
+
+        builder.setDecodeFormat();//自定义图片质量
+    }
+
+    @Override
+    public void registerComponents(Context context, Glide glide) {
+        //TODO
+    }
+}
+```
+
+### 例子(配置默认图片质量)
+
+由于Glide的配置涉及到的东西比较多，在以后的文章里面会对每一种配置做说明具体介绍，这里就先示范一个比较简单的配置，那就是图片质量配置
+
+用过Picasso的朋友应该知道，Picasso默认的图片质量是ARGB_8888,而Glide默认的图片质量是RGB_565，这里我们就来修改默认配置，让Glide的默认质量为ARGB_8888
+
+(ARGB_8888是指32位图，即每个像素占4byte) 
+(RGB_565是16位图，即每个像素占2byte)
+
+``` java
+public class XiayuGlideModule implements GlideModule {
+    @Override
+    public void applyOptions(Context context, GlideBuilder builder) {
+        //自定义图片质量
+        builder.setDecodeFormat(DecodeFormat.PREFER_ARGB_8888);
+    }
+
+    @Override
+    public void registerComponents(Context context, Glide glide) {
+        //TODO
+    }
+}
+```
+
+### 可以配置多个GlideModule
+
+在清单文件中可以配置**多个GlideModule**，Glide会依次遍历并读取
+
+### 自定义内存缓存
+
+通过调用builder的setXXX方法就可以自定义内存缓存的大小了
+
+(**MemoryCach**以及**BitmapPool**都与内存缓存有关)
+
+``` java
+public class XiayuGlideModule implements GlideModule {
+
+    @Override
+    public void applyOptions(Context context, GlideBuilder builder) {
+        //配置内存缓存大小 10MB
+        builder.setMemoryCache(new LruResourceCache(10*1024*1024));
+        //配置图片池大小   20MB
+        builder.setBitmapPool(new LruBitmapPool(20*1024*1024));
+    }
+
+    @Override
+    public void registerComponents(Context context, Glide glide) {
+    }
+}
+```
+
+但是内存缓存的大小数值其实不应该是随便配置的，Glide的内部的默认值是通过一系列的计算获取的，比如说判断手机是否高配置手机等。
+
+这样有个取巧的办法，就是**获取Glide默认的设置**，**然后**在这个设置的基础上进行**修改**
+
+``` java
+public class XiayuGlideModule implements GlideModule {
+    @Override
+    public void applyOptions(Context context, GlideBuilder builder) {
+        //获取内存计算器
+        MemorySizeCalculator calculator = new MemorySizeCalculator(context);
+        //获取Glide默认内存缓存大小
+        int defaultMemoryCacheSize = calculator.getMemoryCacheSize();
+        //获取Glide默认图片池大小
+        int defaultBitmapPoolSize  = calculator.getBitmapPoolSize();
+        //将数值修改为之前的1.1倍
+        int myMemoryCacheSize  = (int) (1.1 * defaultMemoryCacheSize);
+        int myBitmapPoolSize   = (int) (1.1 * defaultBitmapPoolSize);
+        //修改默认值
+        builder.setMemoryCache(new LruResourceCache(myMemoryCacheSize));
+        builder.setBitmapPool(new LruBitmapPool(myBitmapPoolSize));
+    }
+
+    @Override
+    public void registerComponents(Context context, Glide glide) {
+
+    }
+}
+```
+
+### 自定义磁盘缓存
+
+磁盘缓存按照访问权限及路径可以分为两种 
+\- **私有缓存** (自己本app可以使用，目录在data/data/应用包名 下面) 
+\- **外部缓存**(都可以访问，目录在扩展空间内，如SD卡)
+
+#### 私有缓存
+- 修改缓存大小
+  下面这样配置的话，主要是**修改**缓存**大小**，缓存路径仍为默认路径(即data/data/应用包名/cache/image_manager_disk_cache)
+``` java
+public class XiayuGlideModule implements GlideModule {
+    @Override
+    public void applyOptions(Context context, GlideBuilder builder) {
+        //设置磁盘缓存大小
+        int size = 100 * 1024 * 1024;
+        //设置磁盘缓存
+        builder.setDiskCache(new InternalCacheDiskCacheFactory(context, size));
+    }
+
+    @Override
+    public void registerComponents(Context context, Glide glide) {
+    }
+}
+```
+
+- 修改缓存路径
+  如果需求**修改**缓存**路径**的话，需要增加一下参数即可(变为data/data/应用包名/cache/xiayu)
+``` java
+    //设置磁盘缓存大小
+    int size = 100 * 1024 * 1024;
+    String dir = "xiayu";
+    //设置磁盘缓存
+    builder.setDiskCache(new InternalCacheDiskCacheFactory(context,dir, size));
+```
+
+#### 外部缓存
+
+下面这样配置的话，缓存会在 SDCard/Android/data/应用包名/cache/image_manager_disk_cache目录下
+
+``` java
+public class XiayuGlideModule implements GlideModule {
+
+    @Override
+    public void applyOptions(Context context, GlideBuilder builder) {
+        //设置磁盘缓存大小
+        int size = 100 * 1024 * 1024;
+        //设置磁盘缓存
+        builder.setDiskCache(new ExternalCacheDiskCacheFactory(context, size));
+    }
+
+    @Override
+    public void registerComponents(Context context, Glide glide) {
+    }
+}
+```
+
+如果需求修改缓存路径的话，需要增加一下参数即可(变为SDCard/Android/data/应用包名/cache/xiayu)
+
+``` java
+    //设置磁盘缓存大小
+    int size = 100 * 1024 * 1024;
+    String dir = "xiayu";
+    //设置磁盘缓存
+    builder.setDiskCache(new ExternalCacheDiskCacheFactory(context,dir, size));
+```
+
+#### 完全自定义路径
+
+上面两种缓存都是把缓存的父目录定死的，能够改变的只是子目录，Glide还提供了一种方式可以完全自定义缓存目录
+
+(需要注意的是这里的路径是配置的绝对路径，所以如果没有指定在sd卡目录下的话是无法直接看到的)
+
+``` java
+public class XiayuGlideModule implements GlideModule {
+
+    @Override
+    public void applyOptions(Context context, GlideBuilder builder) {
+        //设置磁盘缓存大小
+        int size = 100 * 1024 * 1024;
+        String dirFolder = "xia";
+        String dirName = "yu";
+        //设置磁盘缓存
+        builder.setDiskCache(new DiskLruCacheFactory(dirFolder, size));
+
+        //builder.setDiskCache(new DiskLruCacheFactory(dirFolder, dirName,size));
+    }
+
+    @Override
+    public void registerComponents(Context context, Glide glide) {
+    }
+}
+```
+
+## 图片的压缩
+
+### Android图片显示相关知识
+#### 图片质量分类
+安卓图片显示的质量配置主要分为四种:
+
+- **ARGB_8888** :32位图，带透明度，每个像素占4个字节
+- **ARGB_4444** :16位图，带透明度，每个像素占2个字节
+- **RGB_565** :16位图，不带透明度，每个像素占2个字节
+- **ALPHA_8** :32位图，只有透明度，不带颜色，每个像素占4个字节
+
+(A代表透明度，RGB代表红绿蓝:即颜色)
+
+#### 图片默认质量
+Picasso的默认质量是 ARGB_8888 
+Glide的默认质量则为 RGB_565
+
+#### 占用内存
+加载一张4000 \* 2000(一般手机拍摄的都超过这个像素)的图片
+
+- Picasso需要占用的内存为: 32MB
+  4000 \* 2000 * 4 / 1024 / 1024 = 30 (MB)
+
+- Glide需要占用的内存为: 16MB
+  4000 \* 2000 * 2 / 1024 / 1024 = 15 (MB)
+
+也就是说只要同时加载几张图片，你的应用就会OOM(内存溢出了)，最恐怖的是就算你的ImageView的宽高只有10px,同样会占用那么多内存，这就是为什么需要做图片压缩的原因了
+
+### 图片质量的压缩或者提高
+
+在Glide里面默认用的是RGB_565，如果需要修改，可通过GlideModule定制【见-通过GlideModule定制Glide】
+
+### 指定图片大小(override)
 
 实际上，使用Glide在绝大多数情况下我们都是不需要指定图片大小的。
-
-在学习本节内容之前，你可能还需要先了解一个概念，就是我们平时在加载图片的时候很容易会造成**内存浪费**。什么叫内存浪费呢？比如说一张图片的尺寸是1000*1000像素，但是我们界面上的ImageView可能只有200*200像素，这个时候如果你不对图片进行任何压缩就直接读取到内存中，这就属于内存浪费了，因为程序中根本就用不到这么高像素的图片。
+我们平时在加载图片的时候很容易会造成**内存浪费**。什么叫内存浪费呢？比如说一张图片的尺寸是1000*1000像素，但是我们界面上的ImageView可能只有200*200像素，这个时候如果你不对图片进行任何压缩就直接读取到内存中，这就属于内存浪费了，因为程序中根本就用不到这么高像素的图片。
 
 关于图片压缩这方面，我之前也翻译过Android官方的一篇文章，感兴趣的朋友可以去阅读一下 [Android高效加载大图、多图解决方案，有效避免程序OOM](http://blog.csdn.net/guolin_blog/article/details/9316683) 。
 
@@ -345,21 +772,352 @@ Glide.with(this)
 
 也正是因为Glide是如此的智能，所以刚才在开始的时候我就说了，在绝大多数情况下我们都是不需要指定图片大小的，因为Glide会自动根据ImageView的大小来决定图片的大小。
 
-#### override
+不过，如果你真的有这样的需求，必须给图片指定一个固定的大小，通过调用**`override`**，就可以把图片压缩到相应的尺寸来显示了，类似这些被处理过的图片，就是之前文章中提到的RESULT(处理图)
 
-不过，如果你真的有这样的需求，必须给图片指定一个固定的大小，Glide仍然是支持这个功能的。修改Glide加载部分的代码，如下所示：
-
-```java
-Glide.with(this)
-     .load(url)
-     .placeholder(R.drawable.loading)
-     .error(R.drawable.error)
-     .diskCacheStrategy(DiskCacheStrategy.NONE)
-     .override(100, 100)
-     .into(imageView);
+``` java
+Glide.with(this).load(mUrl)
+	.override(300,300)
+	.into(mIv);
 ```
 
-仍然非常简单，这里使用override()方法指定了一个图片的尺寸，也就是说，Glide现在只会将图片加载成100*100像素的尺寸，而不会管你的ImageView的大小是多少了。
+注意，这里具体会压缩到什么尺寸还会根据很多条件来计算，所以最终压缩的结果的宽高会比较接近你的传值，但是不一定会完全相同，如果感兴趣的可以期待本系列后面的Glide源码解析中的具体介绍
+
+(一般来说控件是什么尺寸就传入相应的宽高，这样是比较适合的压缩比例)
+
+
+
+## 图片预处理(圆角，高斯模糊等)
+
+### 1.创建一个类继承BitmapTransformation
+
+需要实现两个方法，其中transform方法里面能拿到bitmap对象，这里就是对图片做处理的地方
+
+``` java
+public  class CornersTransform extends BitmapTransformation {
+        @Override
+        protected Bitmap transform(BitmapPool pool, Bitmap toTransform, int outWidth, int outHeight) {
+            //TODO
+        }
+
+        @Override
+        public String getId() {
+           //TODO
+        }
+}
+```
+
+### 2.使用
+
+通过调用transform方法就能展示处理后的图片
+
+``` java
+Glide.with(this).load(url)
+	.transform(new CornersTransform())
+	.into(iv1);
+```
+
+### 举例(圆角处理)
+#### 1 自定义Transformation
+
+``` java
+public  class CornersTransform extends BitmapTransformation {
+    private float radius;
+
+    public CornersTransform(Context context) {
+        super(context);
+        radius = 10;
+    }
+
+    public CornersTransform(Context context, float radius) {
+        super(context);
+        this.radius = radius;
+    }
+
+    @Override
+    protected Bitmap transform(BitmapPool pool, Bitmap toTransform, int outWidth, int outHeight) {
+        return cornersCrop(pool, toTransform);
+    }
+
+    private Bitmap cornersCrop(BitmapPool pool, Bitmap source) {
+        if (source == null) return null;
+
+        Bitmap result = pool.get(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
+        if (result == null) {
+            result = Bitmap.createBitmap(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
+        }
+
+        Canvas canvas = new Canvas(result);
+        Paint  paint  = new Paint();
+        paint.setShader(new BitmapShader(source, BitmapShader.TileMode.CLAMP, BitmapShader.TileMode.CLAMP));
+        paint.setAntiAlias(true);
+        RectF rectF = new RectF(0f, 0f, source.getWidth(), source.getHeight());
+        canvas.drawRoundRect(rectF, radius, radius, paint);
+        return result;
+    }
+
+    @Override
+    public String getId() {
+        return getClass().getName();
+    }
+}
+```
+
+##### 2 使用
+
+``` java
+Glide.with(this).load(url).transform(new CornersTransform(this,50)).into(iv1);
+```
+
+效果如下:
+
+![](https://upload-images.jianshu.io/upload_images/9028834-30576bb91b2561fb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+
+### 使用多个transform
+
+transform方法是**不支持多次调用**的，如果你调用了两次，那么第二次的会覆盖了第一次的效果
+
+但是他有一个重载的方法**可以传入多个对象**，这样传入的变形器都能够生效
+
+``` java
+Glide.with(this).load(url)
+	.transform(new CircleTransform(this),new CornersTransform(this,50))
+	.into(iv1);
+```
+
+### 三方库
+
+如果你觉得自己自定义transform比较困难，或者你想学习别人的图片处理方法，可以在试一试github上的这个三方库
+
+[Glide Transformations](https://github.com/wasabeef/glide-transformations)
+
+<https://github.com/wasabeef/glide-transformations>
+
+效果(支持圆角，高斯模糊等)
+[![gif](https://upload-images.jianshu.io/upload_images/9028834-9a4a6ab1119992c3.gif?imageMogr2/auto-orient/strip)](https://upload-images.jianshu.io/upload_images/9028834-9a4a6ab1119992c3.gif?imageMogr2/auto-orient/strip)
+
+
+
+## 图片的剪裁(ScaleType)
+
+讲到图片的剪裁，我们首先要介绍一下ImageView的ScaleType设置效果
+
+### ImageView的ScaleType
+
+ImageView的ScaleType一共有**8种属性**:
+
+#### 效果图
+
+![图片宽高>ImageView](https://upload-images.jianshu.io/upload_images/9028834-d9327c8021307354.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)  ![图片宽高<mageView](https://upload-images.jianshu.io/upload_images/9028834-f03bb6e73810efd7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+#### 属性介绍
+##### (1)matrix
+**不缩放**，图片与控件 **左上角** 对齐，当图片大小超过控件时将 被裁剪
+
+##### (2)center
+**不缩放**，图片与控件 **中心点** 对齐，当图片大小超过控件时将 被裁剪
+
+##### (3)centerInside
+以**完整显示**图片为目标，**不剪裁**，当**显示不下**的**时**候将**缩放**，能够显示的情况下不缩放
+
+##### (4)centerCrop
+以**填满整个控件**为目标，**等比缩放**，超过控件时将被 **裁剪** ( 宽高都要填满，所以只要图片宽高比与控件宽高比不同时，一定会被剪裁)
+
+##### (5)fitCenter(默认)
+**自适应**控件， **不剪裁**，在**不超过控件**的前提下，**等比缩放到最大**，**居中**显示
+
+##### (6)fitStart
+**自适应**控件， 不剪裁，在不超过控件的前提下，等比缩放到最大，**靠左(上)**显示
+
+##### (7)fitEnd
+**自适应**控件， 不剪裁，在不超过控件的前提下，等比缩放到最大，**靠右(下)**显示
+
+##### (8)fitXY
+以**填满整个控件**为目标， 不按比例**拉伸**或缩放(可能会变形)，不剪裁
+
+
+#### 默认是FIT_CENTER
+有些文章说默认是matrix,是不正确的，其实**默认是FIT_CENTER**
+
+可以通过ImageView的源码看到默认设置
+
+``` java
+private void initImageView() {
+    mMatrix = new Matrix();
+    mScaleType = ScaleType.FIT_CENTER;
+
+    if (!sCompatDone) {
+        final int targetSdkVersion = mContext.getApplicationInfo().targetSdkVersion;
+        sCompatAdjustViewBounds = targetSdkVersion <= Build.VERSION_CODES.JELLY_BEAN_MR1;
+        sCompatUseCorrectStreamDensity = targetSdkVersion > Build.VERSION_CODES.M;
+        sCompatDrawableVisibilityDispatch = targetSdkVersion < Build.VERSION_CODES.N;
+        sCompatDone = true;
+    }
+}
+```
+
+
+
+### Glide配置
+
+Glide有两个方法可以设置图片剪裁的策略
+①**fitCenter()**
+②**centerCrop()**
+
+这两个方法其实都是通过调用transform方法来对图片进行处理
+
+#### 默认策略
+当你没有调用上述两个方法，并且也没有调用transform方法的时候，在Glide调用into方法时，会根据你设置的ImageView的ScaleType来做处理
+
+``` java
+    if (!isTransformationSet && view.getScaleType() != null) {
+        switch (view.getScaleType()) {
+            case CENTER_CROP:
+                applyCenterCrop();
+                break;
+            case FIT_CENTER:
+            case FIT_START:
+            case FIT_END:
+                applyFitCenter();
+                break;
+            //$CASES-OMITTED$
+            default:
+                // Do nothing.
+        }
+    }
+```
+
+applyCenterCrop其实还是调用的centerCrop
+
+applyFitCenter其实还是调用的applyFitCenter
+
+通过默认的配置加载图片
+
+``` java
+Glide.with(this).load(url).into(iv1);
+```
+
+效果跟ImageView设置src一样
+
+#### fitCenter
+
+内部是调用transform方法来处理的，处理代码这边只是展示一下，就不做详细的介绍了，有兴趣的朋友可以研究
+
+``` java
+public static Bitmap fitCenter(Bitmap toFit, BitmapPool pool, int width, int height) {
+        if (toFit.getWidth() == width && toFit.getHeight() == height) {
+            if (Log.isLoggable(TAG, Log.VERBOSE)) {
+                Log.v(TAG, "requested target size matches input, returning input");
+            }
+            return toFit;
+        }
+        final float widthPercentage = width / (float) toFit.getWidth();
+        final float heightPercentage = height / (float) toFit.getHeight();
+        final float minPercentage = Math.min(widthPercentage, heightPercentage);
+
+        // take the floor of the target width/height, not round. If the matrix
+        // passed into drawBitmap rounds differently, we want to slightly
+        // overdraw, not underdraw, to avoid artifacts from bitmap reuse.
+        final int targetWidth = (int) (minPercentage * toFit.getWidth());
+        final int targetHeight = (int) (minPercentage * toFit.getHeight());
+
+        if (toFit.getWidth() == targetWidth && toFit.getHeight() == targetHeight) {
+            if (Log.isLoggable(TAG, Log.VERBOSE)) {
+                Log.v(TAG, "adjusted target size matches input, returning input");
+            }
+            return toFit;
+        }
+
+        Bitmap.Config config = getSafeConfig(toFit);
+        Bitmap toReuse = pool.get(targetWidth, targetHeight, config);
+        if (toReuse == null) {
+            toReuse = Bitmap.createBitmap(targetWidth, targetHeight, config);
+        }
+        // We don't add or remove alpha, so keep the alpha setting of the Bitmap we were given.
+        TransformationUtils.setAlpha(toFit, toReuse);
+
+        if (Log.isLoggable(TAG, Log.VERBOSE)) {
+            Log.v(TAG, "request: " + width + "x" + height);
+            Log.v(TAG, "toFit:   " + toFit.getWidth() + "x" + toFit.getHeight());
+            Log.v(TAG, "toReuse: " + toReuse.getWidth() + "x" + toReuse.getHeight());
+            Log.v(TAG, "minPct:   " + minPercentage);
+        }
+
+        Canvas canvas = new Canvas(toReuse);
+        Matrix matrix = new Matrix();
+        matrix.setScale(minPercentage, minPercentage);
+        Paint paint = new Paint(PAINT_FLAGS);
+        canvas.drawBitmap(toFit, matrix, paint);
+
+        return toReuse;
+    }
+```
+
+效果图:
+
+``` java
+Glide.with(this).load(url).fitCenter().into(iv1);
+```
+
+#### centerCrop
+
+跟fitCenter的原理一样，只是具体处理逻辑不一样
+
+``` java
+public static Bitmap centerCrop(Bitmap recycled, Bitmap toCrop, int width, int height) {
+    if (toCrop == null) {
+        return null;
+    } else if (toCrop.getWidth() == width && toCrop.getHeight() == height) {
+        return toCrop;
+    }
+    // From ImageView/Bitmap.createScaledBitmap.
+    final float scale;
+    float dx = 0, dy = 0;
+    Matrix m = new Matrix();
+    if (toCrop.getWidth() * height > width * toCrop.getHeight()) {
+        scale = (float) height / (float) toCrop.getHeight();
+        dx = (width - toCrop.getWidth() * scale) * 0.5f;
+    } else {
+        scale = (float) width / (float) toCrop.getWidth();
+        dy = (height - toCrop.getHeight() * scale) * 0.5f;
+    }
+
+    m.setScale(scale, scale);
+    m.postTranslate((int) (dx + 0.5f), (int) (dy + 0.5f));
+    final Bitmap result;
+    if (recycled != null) {
+        result = recycled;
+    } else {
+        result = Bitmap.createBitmap(width, height, getSafeConfig(toCrop));
+    }
+
+    // We don't add or remove alpha, so keep the alpha setting of the Bitmap we were given.
+    TransformationUtils.setAlpha(toCrop, result);
+
+    Canvas canvas = new Canvas(result);
+    Paint paint = new Paint(PAINT_FLAGS);
+    canvas.drawBitmap(toCrop, m, paint);
+    return result;
+}
+```
+
+效果图(所有的都是与centerCrop效果一样):
+
+``` java
+Glide.with(this).load(url).centerCrop().into(iv2);
+```
+
+#### 效果图对比
+[![scaleType效果对比图](https://upload-images.jianshu.io/upload_images/9028834-91c74c3c2a9e1fe9.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)](https://upload-images.jianshu.io/upload_images/9028834-91c74c3c2a9e1fe9.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+#### 注意
+
+有一点要注意的就是fitCenter和centerCrop方法与transform方法可以共存，但是有时候会互相影响，如果说圆角处理遇到了剪裁，圆角那一部分可能会刚好被剪裁掉了
+
+
+这一章节涉及到的主要是取图方面的知识，如果是对取图方面要求不高的项目，那么用原生的scaletpye或者是Glide提供的两个方法即可，但是如果是取图规则特别复杂的项目那么就需要通过自定义transform了，具体可以参考Glide的两个transform的处理，也可以用github上不错的三方库。
+
+
 
 # 从源码的角度理解Glide的执行流程
 
@@ -610,6 +1368,7 @@ RequestManagerRetriever类中看似有很多个get()方法的重载，什么Cont
 ## 2. Glide.with(..).load(..)
 
 ### load调用图解
+
 [![load调用图解](https://upload-images.jianshu.io/upload_images/9028834-67009b4eefd164bd.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)](https://github.com/Rtia33/Notes/blob/master/Pics/Glide_load%E5%9B%BE%E8%A7%A3.jpg?raw=true)
 
 ### 2.1 requestManager.load(..)
@@ -1023,14 +1782,19 @@ public class DrawableRequestBuilder<ModelType>
 ```
 
 ## 3. Glide.with(…).load(…).into(ImageView)
+
 into()方法是整个Glide图片加载流程中逻辑最复杂的地方。
 
-
 ### into调用图解
+
 [![into调用图解](https://upload-images.jianshu.io/upload_images/9028834-99f9bea808aee2b5.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)](https://github.com/Rtia33/Notes/blob/master/Pics/Glide_into%E5%9B%BE%E8%A7%A3.jpg?raw=true)
+
 #### begin调用图解
+
 [![begin调用图解](https://upload-images.jianshu.io/upload_images/9028834-29b267154443da4e.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)](https://github.com/Rtia33/Notes/blob/master/Pics/Glide_begin%E5%9B%BE%E8%A7%A3.jpg?raw=true)
+
 #### onSizeReady调用图解
+
 [![onSizeReady调用图解](https://upload-images.jianshu.io/upload_images/9028834-922b260dd3402cf9.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)](https://github.com/Rtia33/Notes/blob/master/Pics/Glide_onSizeReady%E5%9B%BE%E8%A7%A3.jpg?raw=true)
 
 ### 3.1 drawableTypeRequest.into(ImageView)
@@ -1422,6 +2186,7 @@ public abstract class ImageViewTarget<Z> extends ViewTarget<ImageView, Z> implem
     }
     ...
 }
+
 
 ```
 
@@ -2168,6 +2933,7 @@ public abstract class Downsampler implements BitmapDecoder<InputStream> {
     ...
 }
 
+
 ```
 
 可以看到，**对服务器返回的InputStream的读取，以及对图片的加载全都在这里**了。
@@ -2800,6 +3566,7 @@ public abstract class ImageViewTarget<Z> extends ViewTarget<ImageView, Z> implem
     protected abstract void setResource(Z resource);
 }
 
+
 ```
 
 可以看到，在ImageViewTarget的onResourceReady()方法当中调用了setResource()方法，而ImageViewTarget的setResource()方法是一个抽象方法，具体的实现还是在子类那边实现的。
@@ -2807,7 +3574,6 @@ public abstract class ImageViewTarget<Z> extends ViewTarget<ImageView, Z> implem
 那子类的setResource()方法是怎么实现的呢？回头再来看一下GlideDrawableImageViewTarget的setResource()方法，没错，调用的view.setImageDrawable()方法，而这个view就是ImageView。代码执行到这里，图片终于也就显示出来了。
 
 那么，我们对Glide执行流程的源码分析，到这里也终于结束了。
-
 
 # Glide的缓存机制
 
@@ -2868,6 +3634,7 @@ EngineKey类的源码大家有兴趣可以自己去看一下，其实主要就�
 那么既然已经默认开启了这个功能，还有什么可讲的用法呢？
 
 ### 禁用内存缓存
+
 只需要调用**skipMemoryCache()**方法并传入**true**，就表示禁用掉Glide的内存缓存功能。
 
 ```
@@ -2875,32 +3642,20 @@ Glide.with(this)
      .load(url)
      .skipMemoryCache(true)
      .into(imageView);
+
 ```
 
 接下来我们就通过阅读源码来分析一下Glide的内存缓存功能是如何实现的。
 
 ### 内存缓存源码分析
+
 其实说到内存缓存的实现，非常容易就让人想到**LruCache**算法（Least Recently Used），也叫近期最少使用算法。它的主要算法原理就是把**最近使用的对象用强引用存储在LinkedHashMap中**，并且**把最近最少使用的对象在缓存值达到预设定值之前从内存中移除**。
 LruCache的用法也比较简单，我在 [Android高效加载大图、多图解决方案，有效避免程序OOM](http://blog.csdn.net/guolin_blog/article/details/9316683) 这篇文章当中有提到过它的用法，感兴趣的朋友可以去参考一下。
 
 **Glide内存缓存**的实现也是**使用**的**LruCache**算法。不过除了LruCache算法之外，Glide**还结合**了一种**弱引用**的机制，共同完成了内存缓存功能，下面就让我们来通过源码分析一下。
 
-#### 内存缓存图解
-##### Engine的创建图解
-[![Glide_Engine的创建图解.jpg](https://upload-images.jianshu.io/upload_images/9028834-a3ad2b324f8877eb.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)](https://github.com/Rtia33/Notes/blob/master/Pics/Glide_Engine%E7%9A%84%E5%88%9B%E5%BB%BA%E5%9B%BE%E8%A7%A3.jpg?raw=true)
-##### 读取内存缓存图解
-[![Glide_读取内存缓存图解.jpg](https://upload-images.jianshu.io/upload_images/9028834-3f7cd69d70a6666d.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)](https://github.com/Rtia33/Notes/blob/master/Pics/Glide_%E8%AF%BB%E5%8F%96%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98%E5%9B%BE%E8%A7%A3.jpg?raw=true)
-##### 写入内存缓存图解
-[![Glide_写入内存缓存图解.jpg](https://upload-images.jianshu.io/upload_images/9028834-285349a28f7cf4b4.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-](https://github.com/Rtia33/Notes/blob/master/Pics/Glide_%E5%86%99%E5%85%A5%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98%E5%9B%BE%E8%A7%A3.jpg?raw=true)
-##### 读取硬盘缓存图解
-decodeFromCache图解
-[![Glide_decodeFromCache图解.jpg](https://upload-images.jianshu.io/upload_images/9028834-b33e7bb467be78fe.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)](https://github.com/Rtia33/Notes/blob/master/Pics/Glide_decodeFromCache%E5%9B%BE%E8%A7%A3.jpg?raw=true)
-##### 写入硬盘缓存图解
-cacheAndDecodeSourceData图解
-[![Glide_cacheAndDecodeSourceData图解.jpg](https://upload-images.jianshu.io/upload_images/9028834-851d12cca3c1a194.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)](https://github.com/Rtia33/Notes/blob/master/Pics/Glide_cacheAndDecodeSourceData%E5%9B%BE%E8%A7%A3.jpg?raw=true)
-
 #### Glide.buildStreamModelLoader()
+
 首先回忆一下，在上一篇文章的第二步load()方法中，我们当时分析到了在`loadGeneric()`方法中会调用`Glide.buildStreamModelLoader()`方法来获取一个ModelLoader对象。当时没有再跟进到这个方法的里面再去分析，那么我们现在来看下它的源码：
 
 ```java
@@ -2941,7 +3696,9 @@ public class Glide {
 ```
 
 这里我们还是只看关键，在第11行【①】去构建ModelLoader对象的时候，先调用了一个Glide.get()方法，而这个方法就是关键。我们可以看到，get()方法中实现的是一个单例功能，而创建Glide对象则是在第24行【②】调用GlideBuilder的createGlide()方法来创建的，那么我们跟到这个方法当中：
+
 #### glideBuilder.createGlide()
+
 ```java
 /* GlideBuilder 源码 */
 public class GlideBuilder {
@@ -3058,7 +3815,9 @@ public class Engine implements EngineJobListener,
 这两个方法中一个使用的就是**LruCache算法**，另一个使用的就是**弱引用**。我们来看一下它们的源码：
 
 #### 内存缓存读取
+
 #### loadFromCache()和loadFromActiveResources()
+
 ```java
 /* Engine 源码 */
 public class Engine implements EngineJobListener,
@@ -3127,6 +3886,7 @@ public class Engine implements EngineJobListener,
 从内存缓存中读取数据的逻辑大概就是这些了。概括一下来说，就是如果能从内存缓存当中读取到要加载的图片，那么就直接进行回调，如果读取不到的话，才会开启线程执行后面的图片加载逻辑。
 
 #### 弱引用缓存写入
+
 现在我们已经搞明白了内存缓存读取的原理，接下来的问题就是内存缓存是在哪里写入的呢？
 上章分析，当图片加载完成之后，会在EngineJob当中通过Handler发送一条消息将执行逻辑切回到主线程当中，从而执行handleResultOnMainThread()方法。
 那么我们现在重新来看一下这个方法：
@@ -3196,6 +3956,7 @@ public class Engine implements EngineJobListener,
 那么这只是**弱引用缓存**，还有另外一种LruCache缓存是在哪里写入的呢？
 
 #### LruCache缓存写入
+
 这就要介绍一下EngineResource中的一个引用机制了。观察刚才的handleResultOnMainThread()方法，在第15行【③】和第19行【④】` engineResource.acquire();`有调用EngineResource的acquire()方法，在第23行【⑤】`engineResource.release();`有调用它的release()方法。其实，**`EngineResource`**是**用**一个**acquired**变量用来**记录**图片被**引用**的**次数**，调用**acquire**()方法会让变量**加1**，调用**release**()方法会让变量**减1**，代码如下所示：
 
 ```java
@@ -3269,25 +4030,28 @@ Glide.with(this)
      .load(url)
      .diskCacheStrategy(DiskCacheStrategy.NONE)
      .into(imageView);
+
 ```
 
 调用diskCacheStrategy()方法并传入DiskCacheStrategy.NONE，就可以禁用掉Glide的硬盘缓存功能了。
 
 ### diskCacheStrategy
+
 这个diskCacheStrategy()方法基本上就是Glide硬盘缓存功能的一切，它可以接收四种参数：
 
-*   DiskCacheStrategy.**NONE**： 表示**不缓存**任何内容。
-*   DiskCacheStrategy.**SOURCE**： 表示只缓存**原始图片**。
-*   DiskCacheStrategy.**RESULT**： 表示只缓存**转换过后的图片**（**默认**选项）。
-*   DiskCacheStrategy.**ALL** ： 表示**既**缓存原始图片，也缓存转换过后的图片。
+- DiskCacheStrategy.**NONE**： 表示**不缓存**任何内容。
+- DiskCacheStrategy.**SOURCE**： 表示只缓存**原始图片**。
+- DiskCacheStrategy.**RESULT**： 表示只缓存**转换过后的图片**（**默认**选项）。
+- DiskCacheStrategy.**ALL** ： 表示**既**缓存原始图片，也缓存转换过后的图片。
 
 当我们使用Glide去加载一张图片的时候，Glide**默认**并**不**会将**原始图片**展示出来，而是会对图片进行**压缩和转换**（我们会在后面学习这方面的内容）。总之就是经过种种一系列操作之后得到的图片，就叫转换过后的图片。而Glide默认情况下在硬盘缓存的就是转换过后的图片，我们通过调用diskCacheStrategy()方法则可以改变这一默认行为。
 
-
 ### 硬盘缓存源码分析
+
 首先，和内存缓存类似，硬盘缓存的实现也是**使用**的**LruCache算法**，而且Google还提供了一个现成的工具类DiskLruCache。我之前也专门写过一篇文章对这个DiskLruCache工具进行了比较全面的分析，感兴趣的朋友可以参考一下 [Android DiskLruCache完全解析，硬盘缓存的最佳方案](http://blog.csdn.net/guolin_blog/article/details/28863651) 。当然，Glide是使用的自己编写的DiskLruCache工具类，但是基本的实现原理都是差不多的。
 
 #### 读取
+
 Glide开启线程来加载图片后会执行EngineRunnable的run()方法，run()方法中又会调用一个decode()方法【见onSizeReady调用图解】
 
 ```java
@@ -3300,7 +4064,9 @@ private Resource<?> decode() throws Exception {
     }
 }
 ```
+
 #### EngineRunnable.decodeFromCache()
+
 可以看到，这里会分为两种情况，一种是调用decodeFromCache()方法从硬盘缓存当中读取图片，一种是调用decodeFromSource()来读取原始图片。默认情况下Glide会优先从缓存当中读取，只有缓存中不存在要读取的图片时，才会去读取原始图片。那么我们现在来看一下decodeFromCache()方法的源码，如下所示：
 
 ```java
@@ -3368,6 +4134,7 @@ public Key getOriginalKey() {
 可以看到，这里其实就是忽略了绝大部分的参数，**只使用了id和signature**这两个参数来**构成缓存Key**。而**signature**参数绝大多数情况下都是**用不到**的，因此基本上可以说就是**由id**（也就是**图片url**）来**决定**的**Original缓存Key**。
 
 #### DecodeJob.loadFromCache(key)
+
 搞明白了这两种缓存Key的区别，那么接下来我们看一下loadFromCache()方法的源码吧：
 
 ```java
@@ -3395,7 +4162,9 @@ private Resource<T> loadFromCache(Key key) throws IOException {
 这样我们就将硬盘缓存读取的源码分析完了，那么硬盘缓存又是在哪里写入的呢？
 
 #### 写入
+
 #### EngineRunnable.decodeFromSource()
+
 刚才已经分析过了，在没有缓存的情况下，会调用decodeFromSource()方法来读取原始图片。那么我们来看下这个方法：
 
 ```java
@@ -3409,6 +4178,7 @@ public Resource<Z> decodeFromSource() throws Exception {
 这个方法中只有两行代码，**decodeSource**()顾名思义是用来**解析原图**片的，而**transformEncodeAndTranscode**()则是用来**对图片进行转换和转码**的。
 
 #### DecodeJob.decodeSource()
+
 我们先来看decodeSource()方法：
 
 ```java
@@ -3478,6 +4248,35 @@ private void writeTransformedToCache(Resource<T> transformed) {
 
 这样我们就将Glide硬盘缓存的实现原理也分析完了。虽然这些源码看上去如此的复杂，但是经过Glide出色的封装，使得我们只需要通过skipMemoryCache()和diskCacheStrategy()这两个方法就可以轻松自如地控制Glide的缓存功能了。
 
+
+
+#### 缓存图解
+
+##### Engine的创建图解
+
+[![Glide_Engine的创建图解.jpg](https://upload-images.jianshu.io/upload_images/9028834-a3ad2b324f8877eb.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)](https://github.com/Rtia33/Notes/blob/master/Pics/Glide_Engine%E7%9A%84%E5%88%9B%E5%BB%BA%E5%9B%BE%E8%A7%A3.jpg?raw=true)
+
+##### 读取内存缓存图解
+
+[![Glide_读取内存缓存图解.jpg](https://upload-images.jianshu.io/upload_images/9028834-3f7cd69d70a6666d.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)](https://github.com/Rtia33/Notes/blob/master/Pics/Glide_%E8%AF%BB%E5%8F%96%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98%E5%9B%BE%E8%A7%A3.jpg?raw=true)
+
+##### 写入内存缓存图解
+
+[![Glide_写入内存缓存图解.jpg](https://upload-images.jianshu.io/upload_images/9028834-285349a28f7cf4b4.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+](https://github.com/Rtia33/Notes/blob/master/Pics/Glide_%E5%86%99%E5%85%A5%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98%E5%9B%BE%E8%A7%A3.jpg?raw=true)
+
+##### 读取硬盘缓存图解
+
+decodeFromCache图解
+[![Glide_decodeFromCache图解.jpg](https://upload-images.jianshu.io/upload_images/9028834-b33e7bb467be78fe.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)](https://github.com/Rtia33/Notes/blob/master/Pics/Glide_decodeFromCache%E5%9B%BE%E8%A7%A3.jpg?raw=true)
+
+##### 写入硬盘缓存图解
+
+cacheAndDecodeSourceData图解
+[![Glide_cacheAndDecodeSourceData图解.jpg](https://upload-images.jianshu.io/upload_images/9028834-851d12cca3c1a194.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)](https://github.com/Rtia33/Notes/blob/master/Pics/Glide_cacheAndDecodeSourceData%E5%9B%BE%E8%A7%A3.jpg?raw=true)
+
+
+
 ## 高级技巧
 
 虽说Glide将缓存功能高度封装之后，使得用法变得非常简单，但同时也带来了一些问题。
@@ -3486,6 +4285,7 @@ private void writeTransformedToCache(Resource<T> transformed) {
 
 ```
 http://url.com/image.jpg?token=d9caa6e02c990b0a
+
 ```
 
 而使用Glide加载这张图片的话，也就会使用这个url地址来组成缓存Key。
@@ -3622,6 +4422,7 @@ public class MyGlideUrl extends GlideUrl {
     }
 
 }
+
 ```
 
 可以看到，这里我们重写了getCacheKey()方法，在里面加入了一段逻辑用于将图片url地址中token参数的这一部分移除掉。这样getCacheKey()方法得到的就是一个没有token参数的url地址，从而不管token怎么变化，最终Glide的缓存Key都是固定不变的了。
@@ -3632,6 +4433,7 @@ public class MyGlideUrl extends GlideUrl {
 Glide.with(this)
      .load(new MyGlideUrl(url))
      .into(imageView);
+
 ```
 
 也就是说，我们需要在**load()方法中传入这个自定义的MyGlideUrl对象**，而不能再像之前那样直接传入url字符串了。不然的话Glide在内部还是会使用原始的GlideUrl类，而不是我们自定义的MyGlideUrl类。
@@ -3640,17 +4442,4 @@ Glide.with(this)
 
 好了，关于Glide缓存方面的内容今天就分析到这里，现在我们不光掌握了Glide缓存的基本用法和高级技巧，还了解了它背后的实现原理，又是收获满满的一篇文章啊。下一篇文章当中，我会继续带着大家深入分析Glide的其他功能模块，讲一讲回调方面的知识，感兴趣的朋友请继续阅读 [Android图片加载框架最全解析（四），玩转Glide的回调与监听](http://blog.csdn.net/guolin_blog/article/details/70215985) 。
 
-
-
-
-# 引用
-
- [Android图片加载框架最全解析（一），Glide的基本用法](http://blog.csdn.net/guolin_blog/article/details/53759439)
- [Android图片加载框架最全解析（二），从源码的角度理解Glide的执行流程](http://blog.csdn.net/guolin_blog/article/details/53939176)
- [Android图片加载框架最全解析（三），深入探究Glide的缓存机制](http://blog.csdn.net/guolin_blog/article/details/54895665)
-[Android图片加载框架最全解析（四），玩转Glide的回调与监听](http://blog.csdn.net/guolin_blog/article/details/70215985)
- [Android图片加载框架最全解析（五），Glide强大的图片变换功能](http://blog.csdn.net/guolin_blog/article/details/71524668)
- [Android图片加载框架最全解析（六），探究Glide的自定义模块功能](http://blog.csdn.net/guolin_blog/article/details/78179422)
-[Android图片加载框架最全解析（七），实现带进度的Glide图片加载功能](http://blog.csdn.net/guolin_blog/article/details/78357251)
-[Android图片加载框架最全解析（八），带你全面了解Glide 4的用法](http://blog.csdn.net/guolin_blog/article/details/78582548)
 
