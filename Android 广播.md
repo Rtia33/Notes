@@ -3,20 +3,20 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [【Android 广播】](#android-%E5%B9%BF%E6%92%AD)
-  - [BroadcastReceiver简介](#broadcastreceiver%E7%AE%80%E4%BB%8B)
+  - [简介](#%E7%AE%80%E4%BB%8B)
     - [BroadcastReceiver作用](#broadcastreceiver%E4%BD%9C%E7%94%A8)
     - [广播应用场景](#%E5%B9%BF%E6%92%AD%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF)
   - [实现原理](#%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86)
-      - [采用的模型](#%E9%87%87%E7%94%A8%E7%9A%84%E6%A8%A1%E5%9E%8B)
-      - [模型讲解](#%E6%A8%A1%E5%9E%8B%E8%AE%B2%E8%A7%A3)
+    - [采用的模型](#%E9%87%87%E7%94%A8%E7%9A%84%E6%A8%A1%E5%9E%8B)
+    - [模型讲解](#%E6%A8%A1%E5%9E%8B%E8%AE%B2%E8%A7%A3)
   - [使用流程](#%E4%BD%BF%E7%94%A8%E6%B5%81%E7%A8%8B)
-      - [1、自定义广播接收器BroadcastReceiver](#1%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B9%BF%E6%92%AD%E6%8E%A5%E6%94%B6%E5%99%A8broadcastreceiver)
-      - [2、广播接收器注册](#2%E5%B9%BF%E6%92%AD%E6%8E%A5%E6%94%B6%E5%99%A8%E6%B3%A8%E5%86%8C)
-        - [1）静态注册](#1%E9%9D%99%E6%80%81%E6%B3%A8%E5%86%8C)
-        - [2）动态注册](#2%E5%8A%A8%E6%80%81%E6%B3%A8%E5%86%8C)
-        - [特别注意](#%E7%89%B9%E5%88%AB%E6%B3%A8%E6%84%8F)
-        - [两种注册方式的区别](#%E4%B8%A4%E7%A7%8D%E6%B3%A8%E5%86%8C%E6%96%B9%E5%BC%8F%E7%9A%84%E5%8C%BA%E5%88%AB)
-      - [3、发送广播](#3%E5%8F%91%E9%80%81%E5%B9%BF%E6%92%AD)
+    - [1、自定义广播接收器BroadcastReceiver](#1%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B9%BF%E6%92%AD%E6%8E%A5%E6%94%B6%E5%99%A8broadcastreceiver)
+    - [2、广播接收器注册](#2%E5%B9%BF%E6%92%AD%E6%8E%A5%E6%94%B6%E5%99%A8%E6%B3%A8%E5%86%8C)
+      - [1）静态注册](#1%E9%9D%99%E6%80%81%E6%B3%A8%E5%86%8C)
+      - [2）动态注册](#2%E5%8A%A8%E6%80%81%E6%B3%A8%E5%86%8C)
+      - [特别注意](#%E7%89%B9%E5%88%AB%E6%B3%A8%E6%84%8F)
+      - [两种注册方式的区别](#%E4%B8%A4%E7%A7%8D%E6%B3%A8%E5%86%8C%E6%96%B9%E5%BC%8F%E7%9A%84%E5%8C%BA%E5%88%AB)
+    - [3、发送广播](#3%E5%8F%91%E9%80%81%E5%B9%BF%E6%92%AD)
   - [无序广播](#%E6%97%A0%E5%BA%8F%E5%B9%BF%E6%92%AD)
     - [1、普通广播（Normal Broadcast）](#1%E6%99%AE%E9%80%9A%E5%B9%BF%E6%92%ADnormal-broadcast)
       - [① 自定义广播接收器](#%E2%91%A0-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B9%BF%E6%92%AD%E6%8E%A5%E6%94%B6%E5%99%A8)
@@ -61,9 +61,9 @@
 
 
 <span id="BroadcastReceiver简介"/>
-## BroadcastReceiver简介
+## 简介
 **BroadcastReceiver**（广播接收器），是一个全局的监听器，属于 Android **四大组件之一**。
-`Android` 广播分为两个角色：广播发送者、广播接收者。
+Android **广播**分为**两个角色**：广播**发送者**、广播**接收者**。
 
 在 Android 中，Broadcast 是一种广泛运用的在应用程序之间传输信息的机制。而 BroadcastReceiver 是对发送出来的 Broadcast 进行过滤接受并响应的一类组件。
 
@@ -74,50 +74,47 @@
 
 
 ### BroadcastReceiver作用
-监听 / 接收 应用 `App` 发出的广播消息，并 做出响应
+监听 / 接收 应用 App 发出的广播消息，并做出响应
 
 
 ### 广播应用场景
 
-- `Android`不同组件间的通信（含 ：应用内 / 不同应用之间）
-- 多线程通信
-- 与 `Android` 系统在特定情况下的通信
-
-> 如：电话呼入时、网络可用时
+- Android**不同组件间的通信**（含 ：应用内 / 不同应用之间）
+- **多线程**通信
+- 与 Android 系统在**特定情况**下的通信
+  如：电话呼入时、网络可用时
 
 
 
 ## 实现原理
 
-#### 采用的模型
+### 采用的模型
 
-- `Android`中的广播使用了设计模式中的**观察者模式**：基于消息的发布 / 订阅事件模型
+Android中的广播使用了设计模式中的**观察者模式**：基于消息的发布 / 订阅事件模型
 
 > 因此，Android将广播的**发送者 和 接收者 解耦**，使得系统方便集成，更易扩展
 
-#### 模型讲解
+### 模型讲解
 
 - 模型中有3个角色：
   1. 消息订阅者（广播接收者）
   2. 消息发布者（广播发布者）
-  3. 消息中心（`AMS`，即`Activity Manager Service`）
+  3. 消息中心（**AMS**，即`Activity Manager Service`）
 - 示意图 & 原理如下
 
-[![模型讲解](http://img.blog.csdn.net/20180126210210820?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)](http://img.blog.csdn.net/20180126210210820?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+[![广播模型讲解](https://upload-images.jianshu.io/upload_images/9028834-e3970fdc308052cd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)](https://upload-images.jianshu.io/upload_images/9028834-e3970fdc308052cd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 
 
 ## 使用流程
 
-- 使用流程如下：
+使用流程如下：
 
-[![流程](http://img.blog.csdn.net/20180126210204101?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)](http://img.blog.csdn.net/20180126210204101?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+[![广播使用流程.png](https://upload-images.jianshu.io/upload_images/9028834-88d58bd1f48b47d4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)](https://upload-images.jianshu.io/upload_images/9028834-88d58bd1f48b47d4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
+下面，将一步步介绍如何使用BroadcastReceiver，即上图中的 **开发者手动完成部分**
 
-- 下面，我将一步步介绍如何使用`BroadcastReceiver`
-  即上图中的 **开发者手动完成部分**
-
-#### 1、自定义广播接收器BroadcastReceiver
+### 1、自定义广播接收器BroadcastReceiver
 
 - 继承**BroadcastReceivre**基类
 - 必须复写抽象方法**onReceive()**方法
@@ -140,10 +137,10 @@ public class mBroadcastReceiver extends BroadcastReceiver {
 ```
 
 <span id="2、广播接收器注册"/>
-#### 2、广播接收器注册
+### 2、广播接收器注册
 注册的方式分为两种：静态注册、动态注册
 
-##### 1）静态注册
+#### 1）静态注册
 - 注册方式：在**AndroidManifest**.xml里通过**`<receive>`**标签声明
 - 属性说明：
 ```java
@@ -184,9 +181,9 @@ public class mBroadcastReceiver extends BroadcastReceiver {
 </receiver>
 ```
 
-当此 `App`首次启动时，系统会**自动**实例化`mBroadcastReceiver`类，并注册到系统中。
+当此 App首次启动时，系统会**自动**实例化mBroadcastReceiver类，并注册到系统中。
 
-##### 2）动态注册
+#### 2）动态注册
 
 - 注册方式：在代码中调用**Context.registerReceiver()**方法
 - 具体代码如下：
@@ -218,7 +215,7 @@ public class mBroadcastReceiver extends BroadcastReceiver {
 }
 ```
 
-##### 特别注意
+#### 特别注意
 
 - 动态广播**最好**在Activity 的 **onResume()注册、onPause()注销**。
 - 原因：
@@ -241,11 +238,11 @@ public class mBroadcastReceiver extends BroadcastReceiver {
 
 PS. 服务Service相反，切勿在 Activity 的 onResume() 和 onPause() 期间绑定和取消绑定服务。
 
-##### 两种注册方式的区别
+#### 两种注册方式的区别
 [![两种注册方式的区别](http://img.blog.csdn.net/20180126210147290?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)](http://img.blog.csdn.net/20180126210147290?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbW9pcmEzMw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 
-#### 3、发送广播
+### 3、发送广播
 - 广播 是 **用”意图（Intent）“标识**
 - 定义广播的本质 = 定义广播所具备的“意图（Intent）”
 - 广播发送 = 广播发送者 将此广播的“意图（Intent）”通过**sendBroadcast()方法**发送出去
@@ -310,7 +307,7 @@ protected void onDestroy() {
 
 这里我们以一个按钮来发送广播，通过sendBroadcast()方法发送我们的创建的Intent自定义广播
 
-```
+```java
 final Intent intent = new Intent();
 //广播内容
 intent.setAction("com.handsome.hensen");

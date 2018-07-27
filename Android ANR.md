@@ -4,75 +4,295 @@
 
 - [【Android ANR】](#android-anr)
   - [概述](#%E6%A6%82%E8%BF%B0)
-    - [1.1 何为ANR](#11-%E4%BD%95%E4%B8%BAanr)
-    - [1.2 为什么会产生ANR](#12-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E4%BA%A7%E7%94%9Fanr)
-    - [1.3 如何避免ANR](#13-%E5%A6%82%E4%BD%95%E9%81%BF%E5%85%8Danr)
-  - [2, ANR分析](#2-anr%E5%88%86%E6%9E%90)
-    - [2.1 获取ANR产生的trace文件](#21-%E8%8E%B7%E5%8F%96anr%E4%BA%A7%E7%94%9F%E7%9A%84trace%E6%96%87%E4%BB%B6)
-    - [2.2 分析traces.txt](#22-%E5%88%86%E6%9E%90tracestxt)
-      - [2.2.1 普通阻塞导致的ANR](#221-%E6%99%AE%E9%80%9A%E9%98%BB%E5%A1%9E%E5%AF%BC%E8%87%B4%E7%9A%84anr)
-      - [2.2.2 CPU满负荷](#222-cpu%E6%BB%A1%E8%B4%9F%E8%8D%B7)
-      - [2.2.3 内存原因](#223-%E5%86%85%E5%AD%98%E5%8E%9F%E5%9B%A0)
-    - [2.2 ANR的处理](#22-anr%E7%9A%84%E5%A4%84%E7%90%86)
-  - [3, 深入一点](#3-%E6%B7%B1%E5%85%A5%E4%B8%80%E7%82%B9)
-    - [3.1 哪些地方是执行在主线程的](#31-%E5%93%AA%E4%BA%9B%E5%9C%B0%E6%96%B9%E6%98%AF%E6%89%A7%E8%A1%8C%E5%9C%A8%E4%B8%BB%E7%BA%BF%E7%A8%8B%E7%9A%84)
-    - [3.2 使用子线程的方式有哪些](#32-%E4%BD%BF%E7%94%A8%E5%AD%90%E7%BA%BF%E7%A8%8B%E7%9A%84%E6%96%B9%E5%BC%8F%E6%9C%89%E5%93%AA%E4%BA%9B)
-      - [3.2.1 启Thread方式](#321-%E5%90%AFthread%E6%96%B9%E5%BC%8F)
-      - [3.2.2 使用AsyncTask](#322-%E4%BD%BF%E7%94%A8asynctask)
-      - [3.2.3 HandlerThread](#323-handlerthread)
-      - [3.2.4 IntentService](#324-intentservice)
-      - [3.2.5 Loader](#325-loader)
-      - [3.2.6 特别注意](#326-%E7%89%B9%E5%88%AB%E6%B3%A8%E6%84%8F)
+    - [定义](#%E5%AE%9A%E4%B9%89)
+    - [类型](#%E7%B1%BB%E5%9E%8B)
+      - [KeyDispatchTimeout](#keydispatchtimeout)
+    - [产生原因](#%E4%BA%A7%E7%94%9F%E5%8E%9F%E5%9B%A0)
+    - [如何避免](#%E5%A6%82%E4%BD%95%E9%81%BF%E5%85%8D)
+  - [补充](#%E8%A1%A5%E5%85%85)
+    - [哪些地方是执行在主线程的](#%E5%93%AA%E4%BA%9B%E5%9C%B0%E6%96%B9%E6%98%AF%E6%89%A7%E8%A1%8C%E5%9C%A8%E4%B8%BB%E7%BA%BF%E7%A8%8B%E7%9A%84)
+    - [使用子线程的方式有哪些](#%E4%BD%BF%E7%94%A8%E5%AD%90%E7%BA%BF%E7%A8%8B%E7%9A%84%E6%96%B9%E5%BC%8F%E6%9C%89%E5%93%AA%E4%BA%9B)
+      - [1 启Thread方式](#1-%E5%90%AFthread%E6%96%B9%E5%BC%8F)
+      - [2 使用AsyncTask](#2-%E4%BD%BF%E7%94%A8asynctask)
+      - [3 HandlerThread](#3-handlerthread)
+      - [4 IntentService](#4-intentservice)
+      - [5 Loader](#5-loader)
+      - [6 特别注意](#6-%E7%89%B9%E5%88%AB%E6%B3%A8%E6%84%8F)
+  - [ANR分析](#anr%E5%88%86%E6%9E%90)
+    - [1 获取ANR产生的trace文件](#1-%E8%8E%B7%E5%8F%96anr%E4%BA%A7%E7%94%9F%E7%9A%84trace%E6%96%87%E4%BB%B6)
+    - [2 分析traces.txt](#2-%E5%88%86%E6%9E%90tracestxt)
+      - [2.1 普通阻塞导致的ANR](#21-%E6%99%AE%E9%80%9A%E9%98%BB%E5%A1%9E%E5%AF%BC%E8%87%B4%E7%9A%84anr)
+      - [2.2 CPU满负荷](#22-cpu%E6%BB%A1%E8%B4%9F%E8%8D%B7)
+      - [2.3 内存原因](#23-%E5%86%85%E5%AD%98%E5%8E%9F%E5%9B%A0)
+    - [3 ANR的处理](#3-anr%E7%9A%84%E5%A4%84%E7%90%86)
 - [ANR定位](#anr%E5%AE%9A%E4%BD%8D)
-    - [**九：如何调查并解决ANR**](#%E4%B9%9D%E5%A6%82%E4%BD%95%E8%B0%83%E6%9F%A5%E5%B9%B6%E8%A7%A3%E5%86%B3anr)
-      - [案例1：关键词:ContentResolver in AsyncTask onPostExecute, high iowait](#%E6%A1%88%E4%BE%8B1%E5%85%B3%E9%94%AE%E8%AF%8Dcontentresolver-in-asynctask-onpostexecute-high-iowait)
-  - [案例2：关键词:在UI线程进行网络数据的读写](#%E6%A1%88%E4%BE%8B2%E5%85%B3%E9%94%AE%E8%AF%8D%E5%9C%A8ui%E7%BA%BF%E7%A8%8B%E8%BF%9B%E8%A1%8C%E7%BD%91%E7%BB%9C%E6%95%B0%E6%8D%AE%E7%9A%84%E8%AF%BB%E5%86%99)
+    - [如何调查并解决ANR](#%E5%A6%82%E4%BD%95%E8%B0%83%E6%9F%A5%E5%B9%B6%E8%A7%A3%E5%86%B3anr)
+    - [案例1：关键词:ContentResolver in AsyncTask onPostExecute, high iowait](#%E6%A1%88%E4%BE%8B1%E5%85%B3%E9%94%AE%E8%AF%8Dcontentresolver-in-asynctask-onpostexecute-high-iowait)
+    - [案例2：关键词:在UI线程进行网络数据的读写](#%E6%A1%88%E4%BE%8B2%E5%85%B3%E9%94%AE%E8%AF%8D%E5%9C%A8ui%E7%BA%BF%E7%A8%8B%E8%BF%9B%E8%A1%8C%E7%BD%91%E7%BB%9C%E6%95%B0%E6%8D%AE%E7%9A%84%E8%AF%BB%E5%86%99)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+
 
 # 【Android ANR】
 
 ## 概述
 
-### 1.1 何为ANR
-ANR全名Application Not Responding, 也就是"应用无响应". 当操作在一段时间内系统无法处理时, 系统层面会弹出上图那样的ANR对话框.
+### 定义
 
-### 1.2 为什么会产生ANR
-在Android里, App的响应能力是由Activity Manager和Window Manager系统服务来监控的. 通常在如下两种情况下会弹出ANR对话框:
+ANR全名Application Not Responding, 也就是"应用无响应". 当操作在一段时间内系统无法处理时, 系统层面会弹出下图这样的ANR对话框
+![](https://upload-images.jianshu.io/upload_images/9028834-7e3bf657ac808689.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-*   5s内无法响应用户输入事件(例如键盘输入, 触摸屏幕等).
+### 类型
 
-*   BroadcastReceiver在10s内无法结束.
+ANR一般有三种类型：
 
-造成以上两种情况的首要原因就是**在主线程(UI线程)里面做了太多的阻塞耗时操作**, 例如文件读写, 数据库读写, 网络查询等等.
+1：**KeyDispatchTimeout**(5 seconds) --**主要类型**
 
-### 1.3 如何避免ANR
+按键或触摸事件在特定时间内无响应
 
-知道了ANR产生的原因, 那么想要避免ANR, 也就很简单了, 就一条规则:
+2：**BroadcastTimeout**(10 seconds)
 
-> 不要在主线程(UI线程)里面做繁重的操作.
+BroadcastReceiver在特定时间内无法处理完成
 
-这里面实际上涉及到两个问题:
+3：**ServiceTimeout**(20 seconds) --**小概率类型**
 
-1.  哪些地方是运行在主线程的?
+Service在特定的时间内无法处理完成
 
-2.  不在主线程做, 在哪儿做?
+#### KeyDispatchTimeout
 
-稍后解答.
+Akey or touch event was not dispatched within the specified time（按键或触摸事件在特定时间内无响应）
 
-## 2, ANR分析
-### 2.1 获取ANR产生的trace文件
+具体的超时时间的定义在framework下
+```java
+/* ActivityManagerService 源码 */
+//How long we wait until we timeout on key dispatching.
+staticfinal int KEY_DISPATCHING_TIMEOUT = 5*1000
+```
+
+### 产生原因
+
+在Android里，App的响应能力是由Activity Manager和Window Manager系统服务来监控的，超时时间的计数一般是从按键分发给app开始。
+超时的原因一般有两种：
+(1)当前的事件没有机会得到处理（即UI线程正在处理前一个事件，没有及时的完成或者looper被某种原因阻塞住了）
+(2)当前的事件正在处理，但没有及时完成
+
+造成以上两种情况的首要原因就是**在主线程(UI线程)里面做了太多的阻塞耗时操作**, 例如文件读写, 数据库读写, 网络查询等等。
+
+### 如何避免
+
+1**：**UI**线程尽量只做跟**UI**相关的工作**
+
+2**：耗时的工作（比如数据库操作，**I/O**，连接网络或者别的有可能阻碍**UI**线程的操作）把它放入单独的线程处理**
+
+3**：尽量用**Handler**来处理**UIthread**和别的**thread**之间的交互**
+
+说了那么多的UI线程，那么哪些属于UI线程呢？
+
+## 补充
+### 哪些地方是执行在主线程的
+
+1. [Activity的所有生命周期回调](https://www.jianshu.com/p/ec6984aa1bb4)都是执行在主线程的.
+2. Service默认是执行在主线程的.
+3. BroadcastReceiver的onReceive回调是执行在主线程的.
+4. 没有使用子线程的looper的Handler的handleMessage, post(Runnable)是执行在主线程的.
+5. AsyncTask的回调中除了doInBackground, 其他都是执行在主线程的.
+6. View的post(Runnable)是执行在主线程的.
+
+### 使用子线程的方式有哪些
+
+上面我们几乎一直在说, 避免ANR的方法就是在子线程中执行耗时阻塞操作. 那么在Android中有哪些方式可以让我们实现这一点呢.
+
+#### 1 启Thread方式
+
+这个其实也是Java实现多线程的方式. 有两种实现方法, 继承Thread 或 实现Runnable接口:
+
+**继承Thread**
+
+```
+class PrimeThread extends Thread {
+    long minPrime;
+    PrimeThread(long minPrime) {
+        this.minPrime = minPrime;
+    }
+
+    public void run() {
+        // compute primes larger than minPrime
+         . . .
+    }
+}
+
+PrimeThread p = new PrimeThread(143);
+p.start();
+
+```
+
+**实现Runnable接口**
+
+```
+class PrimeRun implements Runnable {
+    long minPrime;
+    PrimeRun(long minPrime) {
+        this.minPrime = minPrime;
+    }
+
+    public void run() {
+        // compute primes larger than minPrime
+         . . .
+    }
+}
+
+PrimeRun p = new PrimeRun(143);
+new Thread(p).start();
+
+```
+
+#### 2 使用AsyncTask
+
+这个是Android特有的方式, AsyncTask顾名思义, 就是异步任务的意思.
+
+```
+private class DownloadFilesTask extends AsyncTask<URL, Integer, Long> {
+    // Do the long-running work in here
+    // 执行在子线程
+    protected Long doInBackground(URL... urls) {
+        int count = urls.length;
+        long totalSize = 0;
+        for (int i = 0; i < count; i++) {
+            totalSize += Downloader.downloadFile(urls[i]);
+            publishProgress((int) ((i / (float) count) * 100));
+            // Escape early if cancel() is called
+            if (isCancelled()) break;
+        }
+        return totalSize;
+    }
+
+    // This is called each time you call publishProgress()
+    // 执行在主线程
+    protected void onProgressUpdate(Integer... progress) {
+        setProgressPercent(progress[0]);
+    }
+
+    // This is called when doInBackground() is finished
+    // 执行在主线程
+    protected void onPostExecute(Long result) {
+        showNotification("Downloaded " + result + " bytes");
+    }
+}
+
+// 启动方式
+new DownloadFilesTask().execute(url1, url2, url3);
+
+```
+
+#### 3 HandlerThread
+
+Android中结合Handler和Thread的一种方式. 前面有云, 默认情况下Handler的handleMessage是执行在主线程的, 但是如果我给这个Handler传入了子线程的looper, handleMessage就会执行在这个子线程中的. HandlerThread正是这样的一个结合体:
+
+```
+// 启动一个名为new_thread的子线程
+HandlerThread thread = new HandlerThread("new_thread");
+thread.start();
+
+// 取new_thread赋值给ServiceHandler
+private ServiceHandler mServiceHandler;
+mServiceLooper = thread.getLooper();
+mServiceHandler = new ServiceHandler(mServiceLooper);
+
+private final class ServiceHandler extends Handler {
+    public ServiceHandler(Looper looper) {
+      super(looper);
+    }
+
+    @Override
+    public void handleMessage(Message msg) {
+      // 此时handleMessage是运行在new_thread这个子线程中了.
+    }
+}
+
+```
+
+#### 4 IntentService
+
+Service是运行在主线程的, 然而IntentService是运行在子线程的.
+
+实际上IntentService就是实现了一个HandlerThread + ServiceHandler的模式.
+
+以上HandlerThread的使用代码示例也就来自于[IntentService源码](https://link.jianshu.com?t=https://github.com/android/platform_frameworks_base/blob/master/core/java/android/app/IntentService.java).
+
+#### 5 Loader
+
+Android 3.0引入的数据加载器, 可以在Activity/Fragment中使用. 支持异步加载数据, 并可监控数据源在数据发生变化时传递新结果. 常用的有CursorLoader, 用来加载数据库数据.
+
+```
+// Prepare the loader.  Either re-connect with an existing one,
+// or start a new one.
+// 使用LoaderManager来初始化Loader
+getLoaderManager().initLoader(0, null, this);
+
+//如果 ID 指定的加载器已存在，则将重复使用上次创建的加载器。
+//如果 ID 指定的加载器不存在，则 initLoader() 将触发 LoaderManager.LoaderCallbacks 方法 //onCreateLoader()。在此方法中，您可以实现代码以实例化并返回新加载器
+
+// 创建一个Loader
+public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    // This is called when a new Loader needs to be created.  This
+    // sample only has one Loader, so we don't care about the ID.
+    // First, pick the base URI to use depending on whether we are
+    // currently filtering.
+    Uri baseUri;
+    if (mCurFilter != null) {
+        baseUri = Uri.withAppendedPath(Contacts.CONTENT_FILTER_URI,
+                  Uri.encode(mCurFilter));
+    } else {
+        baseUri = Contacts.CONTENT_URI;
+    }
+
+    // Now create and return a CursorLoader that will take care of
+    // creating a Cursor for the data being displayed.
+    String select = "((" + Contacts.DISPLAY_NAME + " NOTNULL) AND ("
+            + Contacts.HAS_PHONE_NUMBER + "=1) AND ("
+            + Contacts.DISPLAY_NAME + " != '' ))";
+    return new CursorLoader(getActivity(), baseUri,
+            CONTACTS_SUMMARY_PROJECTION, select, null,
+            Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC");
+}
+
+// 加载完成
+public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    // Swap the new cursor in.  (The framework will take care of closing the
+    // old cursor once we return.)
+    mAdapter.swapCursor(data);
+}
+
+```
+
+具体请参看[官网Loader介绍](https://link.jianshu.com?t=https://developer.android.com/guide/components/loaders.html?hl=zh-cn).
+
+#### 6 特别注意
+
+使用Thread和HandlerThread时, 为了使效果更好, 建议设置Thread的优先级偏低一点:
+
+```
+Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
+```
+
+因为如果没有做任何优先级设置的话, 你创建的Thread默认和UI Thread是具有同样的优先级的, 你懂的. 同样的优先级的Thread, CPU调度上还是可能会阻塞掉你的UI Thread, 导致ANR的.
+
+
+
+## ANR分析
+
+### 1 获取ANR产生的trace文件
 
 ANR产生时, 系统会生成一个traces.txt的文件放在/data/anr/下. 可以通过[adb](https://www.jianshu.com/p/5980c8c282ef)命令将其导出到本地:
 
 ```
 $adb pull data/anr/traces.txt .
-
 ```
 
-### 2.2 分析traces.txt
+### 2 分析traces.txt
 
-#### 2.2.1 普通阻塞导致的ANR
+#### 2.1 普通阻塞导致的ANR
 
 获取到的tracs.txt文件一般如下:
 
@@ -121,15 +341,14 @@ DALVIK THREADS (41):
 
 如上trace信息中的**添加的中文注释**已基本说明了trace文件该怎么分析:
 
-1.  文件最上的即为最新产生的ANR的trace信息.
-
-2.  前面两行表明ANR发生的进程pid, 时间, 以及进程名字(包名).
-
-3.  寻找我们的代码点, 然后往前推, 看方法调用栈, 追溯到问题产生的根源.
+1. 文件最上的即为最新产生的ANR的trace信息.
+2. 前面两行表明ANR发生的进程pid, 时间, 以及进程名字(包名).
+3. 寻找我们的代码点, 然后往前推, 看方法调用栈, 追溯到问题产生的根源.
 
 > 以上的ANR trace是属于相对简单, 还有可能你并没有在主线程中做过于耗时的操作, 然而还是ANR了. 这就有可能是如下两种情况了:
 
-#### 2.2.2 CPU满负荷
+#### 2.2 CPU满负荷
+
 这个时候你看到的trace信息可能会包含这样的信息:
 
 ```
@@ -147,13 +366,13 @@ CPU usage from 3330ms to 814ms ago:
 
 最后一句表明了:
 
-1.  当是CPU占用100%, 满负荷了.
-
-2.  其中绝大数是被iowait即I/O操作占用了.
+1. 当是CPU占用100%, 满负荷了.
+2. 其中绝大数是被iowait即I/O操作占用了.
 
 此时分析方法调用栈, 一般来说会发现是方法中有频繁的文件读写或是数据库读写操作放在主线程来做了.
 
-#### 2.2.3 内存原因
+#### 2.3 内存原因
+
 其实内存原因有可能会导致ANR, 例如如果由于内存泄露, App可使用内存所剩无几, 我们点击按钮启动一个大图片作为背景的activity, 就可能会产生ANR, 这时trace信息可能是这样的:
 
 ```java
@@ -184,276 +403,28 @@ free: 296 2436 N/A 2732
 
 > 当然这种情况可能更多的是会产生OOM的异常...
 
-### 2.2 ANR的处理
+### 3 ANR的处理
+
 针对三种不同的情况, 一般的处理情况如下
 
-1.  主线程阻塞的
+1. 主线程阻塞的
 
-    开辟单独的子线程来处理耗时阻塞事务.
+   开辟单独的子线程来处理耗时阻塞事务.
 
-2.  CPU满负荷, I/O阻塞的
+2. CPU满负荷, I/O阻塞的
 
-    I/O阻塞一般来说就是文件读写或数据库操作执行在主线程了, 也可以通过开辟子线程的方式异步执行.
+   I/O阻塞一般来说就是文件读写或数据库操作执行在主线程了, 也可以通过开辟子线程的方式异步执行.
 
-3.  内存不够用的
+3. 内存不够用的
 
-    增大VM内存, 使用largeHeap属性, 排查内存泄露(这个在内存优化那篇细说吧)等.
+   增大VM内存, 使用largeHeap属性, 排查内存泄露(这个在内存优化那篇细说吧)等.
 
-## 3, 深入一点
-没有人愿意在出问题之后去解决问题.
 
-高手和新手的区别是, 高手知道怎么在一开始就避免问题的发生. 那么针对ANR这个问题, 我们需要做哪些层次的工作来避免其发生呢?
-
-### 3.1 哪些地方是执行在主线程的
-1.  [Activity的所有生命周期回调](https://www.jianshu.com/p/ec6984aa1bb4)都是执行在主线程的.
-
-2.  Service默认是执行在主线程的.
-
-3.  BroadcastReceiver的onReceive回调是执行在主线程的.
-
-4.  没有使用子线程的looper的Handler的handleMessage, post(Runnable)是执行在主线程的.
-
-5.  AsyncTask的回调中除了doInBackground, 其他都是执行在主线程的.
-
-6.  View的post(Runnable)是执行在主线程的.
-
-### 3.2 使用子线程的方式有哪些
-上面我们几乎一直在说, 避免ANR的方法就是在子线程中执行耗时阻塞操作. 那么在Android中有哪些方式可以让我们实现这一点呢.
-
-#### 3.2.1 启Thread方式
-这个其实也是Java实现多线程的方式. 有两种实现方法, 继承Thread 或 实现Runnable接口:
-
-**继承Thread**
-
-```
-class PrimeThread extends Thread {
-    long minPrime;
-    PrimeThread(long minPrime) {
-        this.minPrime = minPrime;
-    }
-
-    public void run() {
-        // compute primes larger than minPrime
-         . . .
-    }
-}
-
-PrimeThread p = new PrimeThread(143);
-p.start();
-
-```
-
-**实现Runnable接口**
-
-```
-class PrimeRun implements Runnable {
-    long minPrime;
-    PrimeRun(long minPrime) {
-        this.minPrime = minPrime;
-    }
-
-    public void run() {
-        // compute primes larger than minPrime
-         . . .
-    }
-}
-
-PrimeRun p = new PrimeRun(143);
-new Thread(p).start();
-
-```
-
-#### 3.2.2 使用AsyncTask
-这个是Android特有的方式, AsyncTask顾名思义, 就是异步任务的意思.
-
-```
-private class DownloadFilesTask extends AsyncTask<URL, Integer, Long> {
-    // Do the long-running work in here
-    // 执行在子线程
-    protected Long doInBackground(URL... urls) {
-        int count = urls.length;
-        long totalSize = 0;
-        for (int i = 0; i < count; i++) {
-            totalSize += Downloader.downloadFile(urls[i]);
-            publishProgress((int) ((i / (float) count) * 100));
-            // Escape early if cancel() is called
-            if (isCancelled()) break;
-        }
-        return totalSize;
-    }
-
-    // This is called each time you call publishProgress()
-    // 执行在主线程
-    protected void onProgressUpdate(Integer... progress) {
-        setProgressPercent(progress[0]);
-    }
-
-    // This is called when doInBackground() is finished
-    // 执行在主线程
-    protected void onPostExecute(Long result) {
-        showNotification("Downloaded " + result + " bytes");
-    }
-}
-
-// 启动方式
-new DownloadFilesTask().execute(url1, url2, url3);
-
-```
-
-#### 3.2.3 HandlerThread
-Android中结合Handler和Thread的一种方式. 前面有云, 默认情况下Handler的handleMessage是执行在主线程的, 但是如果我给这个Handler传入了子线程的looper, handleMessage就会执行在这个子线程中的. HandlerThread正是这样的一个结合体:
-
-```
-// 启动一个名为new_thread的子线程
-HandlerThread thread = new HandlerThread("new_thread");
-thread.start();
-
-// 取new_thread赋值给ServiceHandler
-private ServiceHandler mServiceHandler;
-mServiceLooper = thread.getLooper();
-mServiceHandler = new ServiceHandler(mServiceLooper);
-
-private final class ServiceHandler extends Handler {
-    public ServiceHandler(Looper looper) {
-      super(looper);
-    }
-
-    @Override
-    public void handleMessage(Message msg) {
-      // 此时handleMessage是运行在new_thread这个子线程中了.
-    }
-}
-
-```
-
-#### 3.2.4 IntentService
-Service是运行在主线程的, 然而IntentService是运行在子线程的.
-
-实际上IntentService就是实现了一个HandlerThread + ServiceHandler的模式.
-
-以上HandlerThread的使用代码示例也就来自于[IntentService源码](https://link.jianshu.com?t=https://github.com/android/platform_frameworks_base/blob/master/core/java/android/app/IntentService.java).
-
-#### 3.2.5 Loader
-Android 3.0引入的数据加载器, 可以在Activity/Fragment中使用. 支持异步加载数据, 并可监控数据源在数据发生变化时传递新结果. 常用的有CursorLoader, 用来加载数据库数据.
-
-```
-// Prepare the loader.  Either re-connect with an existing one,
-// or start a new one.
-// 使用LoaderManager来初始化Loader
-getLoaderManager().initLoader(0, null, this);
-
-//如果 ID 指定的加载器已存在，则将重复使用上次创建的加载器。
-//如果 ID 指定的加载器不存在，则 initLoader() 将触发 LoaderManager.LoaderCallbacks 方法 //onCreateLoader()。在此方法中，您可以实现代码以实例化并返回新加载器
-
-// 创建一个Loader
-public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-    // This is called when a new Loader needs to be created.  This
-    // sample only has one Loader, so we don't care about the ID.
-    // First, pick the base URI to use depending on whether we are
-    // currently filtering.
-    Uri baseUri;
-    if (mCurFilter != null) {
-        baseUri = Uri.withAppendedPath(Contacts.CONTENT_FILTER_URI,
-                  Uri.encode(mCurFilter));
-    } else {
-        baseUri = Contacts.CONTENT_URI;
-    }
-
-    // Now create and return a CursorLoader that will take care of
-    // creating a Cursor for the data being displayed.
-    String select = "((" + Contacts.DISPLAY_NAME + " NOTNULL) AND ("
-            + Contacts.HAS_PHONE_NUMBER + "=1) AND ("
-            + Contacts.DISPLAY_NAME + " != '' ))";
-    return new CursorLoader(getActivity(), baseUri,
-            CONTACTS_SUMMARY_PROJECTION, select, null,
-            Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC");
-}
-
-// 加载完成
-public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-    // Swap the new cursor in.  (The framework will take care of closing the
-    // old cursor once we return.)
-    mAdapter.swapCursor(data);
-}
-
-```
-
-具体请参看[官网Loader介绍](https://link.jianshu.com?t=https://developer.android.com/guide/components/loaders.html?hl=zh-cn).
-
-#### 3.2.6 特别注意
-使用Thread和HandlerThread时, 为了使效果更好, 建议设置Thread的优先级偏低一点:
-
-```
-Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
-```
-
-因为如果没有做任何优先级设置的话, 你创建的Thread默认和UI Thread是具有同样的优先级的, 你懂的. 同样的优先级的Thread, CPU调度上还是可能会阻塞掉你的UI Thread, 导致ANR的.
 
 
 
 # ANR定位
 
-**一：什么是ANR**
-
-ANR:Application Not Responding，即应用无响应
-
-**二：ANR的类型**
-
-ANR一般有三种类型：
-
-1：KeyDispatchTimeout(5 seconds) --**主要类型**
-
-按键或触摸事件在特定时间内无响应
-
-2**：**BroadcastTimeout(10 seconds)
-
-BroadcastReceiver在特定时间内无法处理完成
-
-3：ServiceTimeout(20 seconds) --**小概率类型**
-
-Service在特定的时间内无法处理完成
-
-**三：KeyDispatchTimeout**
-
-Akey or touch event was not dispatched within the specified time（按键或触摸事件在特定时间内无响应）
-
-具体的超时时间的定义在framework下的
-
-ActivityManagerService.java
-
-//How long we wait until we timeout on key dispatching.
-
-staticfinal int KEY_DISPATCHING_TIMEOUT = 5*1000
-
-**四：为什么会超时呢？**
-
-超时时间的计数一般是从按键分发给app开始。超时的原因一般有两种**：**
-
-(1)当前的事件没有机会得到处理（即UI线程正在处理前一个事件，没有及时的完成或者looper被某种原因阻塞住了）
-
-(2)当前的事件正在处理，但没有及时完成
-
-**五：如何避免KeyDispatchTimeout**
-
-1**：**UI**线程尽量只做跟**UI**相关的工作**
-
-2**：耗时的工作（比如数据库操作，**I/O**，连接网络或者别的有可能阻碍**UI**线程的操作）把它放入单独的线程处理**
-
-3**：尽量用**Handler**来处理**UIthread**和别的**thread**之间的交互**
-
-**六：UI线程**
-
-说了那么多的UI线程，那么哪些属于UI线程呢？
-
-UI线程主要包括如下：
-
-1.  Activity:onCreate(), onResume(), onDestroy(), onKeyDown(), onClick(),etc
-
-2.  AsyncTask: onPreExecute(), onProgressUpdate(), onPostExecute(), onCancel,etc
-
-3.  Mainthread handler: handleMessage(), post*(runnable r), etc
-
-4.  other
 
 **七:如何去分析ANR**
 
@@ -515,15 +486,11 @@ UI线程主要包括如下：
 
 如何获取呢？可以用如下命令获取
 
-1.  $chmod 777 /data/anr
-
-2.  $rm /data/anr/traces.txt
-
-3.  $ps
-
-4.  $kill -3 PID
-
-5.  adbpull data/anr/traces.txt ./mytraces.txt
+1. $chmod 777 /data/anr
+2. $rm /data/anr/traces.txt
+3. $ps
+4. $kill -3 PID
+5. adbpull data/anr/traces.txt ./mytraces.txt
 
 从trace.txt文件，看到最多的是如下的信息：
 
@@ -564,7 +531,7 @@ THREAD_VMWAIT = 8, /* waiting on a VM resource */
 THREAD_SUSPENDED = 9, /* suspended, usually by GC or debugger */  
 ```
 
-### **九：如何调查并解决ANR**
+### 如何调查并解决ANR
 
 1：首先分析log
 
@@ -574,9 +541,9 @@ THREAD_SUSPENDED = 9, /* suspended, usually by GC or debugger */
 
 4：仔细查看ANR的成因（iowait?block?memoryleak?）
 
-**十：案例**
 
-#### 案例1：关键词:ContentResolver in AsyncTask onPostExecute, high iowait
+
+### 案例1：关键词:ContentResolver in AsyncTask onPostExecute, high iowait
 
 Process:com.android.email
 Activity:com.android.email/.activity.MessageView
@@ -637,85 +604,117 @@ atcom.android.internal.os.ZygoteIn
 
 **原来：**
 
-<colgroup style="font-family: Verdana !important;"><col width="1099" style="font-family: Verdana !important;"></colgroup>
+
 | 
 
-        finalMessagemessage=Message.restoreMessageWithId(mProviderContext,messageId);
+```
+    finalMessagemessage=Message.restoreMessageWithId(mProviderContext,messageId);
+```
 
  |
 | 
 
-        if(message==null){
+```
+    if(message==null){
+```
 
  |
 | 
 
-           return;
+```
+       return;
+```
 
  |
 | 
 
-        }
+```
+    }
+```
 
  |
 | 
 
-        Accountaccount=Account.restoreAccountWithId(mProviderContext,message.mAccountKey);
+```
+    Accountaccount=Account.restoreAccountWithId(mProviderContext,message.mAccountKey);
+```
 
  |
 | 
 
-        if(account==null){
+```
+    if(account==null){
+```
 
  |
 | 
 
-           return;//isMessagingController returns false for null, but let's make itclear.
+```
+       return;//isMessagingController returns false for null, but let's make itclear.
+```
 
  |
 | 
 
-        }
+```
+    }
+```
 
  |
 | 
 
-        if(isMessagingController(account)){
+```
+    if(isMessagingController(account)){
+```
 
  |
 | 
 
-           newThread(){
+```
+       newThread(){
+```
 
  |
 | 
 
-               @Override
+```
+           @Override
+```
 
  |
 | 
 
-               publicvoidrun(){
+```
+           publicvoidrun(){
+```
 
  |
 | 
 
-                  mLegacyController.processPendingActions(message.mAccountKey);
+```
+              mLegacyController.processPendingActions(message.mAccountKey);
+```
 
  |
 | 
 
-               }
+```
+           }
+```
 
  |
 | 
 
-           }.start();
+```
+       }.start();
+```
 
  |
 | 
 
-        }
+```
+    }
+```
 
  |
 
@@ -726,66 +725,96 @@ newThread() {
 <colgroup style="font-family: Verdana !important;"><col width="1099" style="font-family: Verdana !important;"></colgroup>
 | 
 
-        finalMessagemessage=Message.restoreMessageWithId(mProviderContext,messageId);
+```
+    finalMessagemessage=Message.restoreMessageWithId(mProviderContext,messageId);
+```
 
  |
 | 
 
-        if(message==null){
+```
+    if(message==null){
+```
 
  |
 | 
 
-           return;
+```
+       return;
+```
 
  |
 | 
 
-        }
+```
+    }
+
+```
 
  |
 | 
 
-        Accountaccount=Account.restoreAccountWithId(mProviderContext,message.mAccountKey);
+```
+    Accountaccount=Account.restoreAccountWithId(mProviderContext,message.mAccountKey);
+
+```
 
  |
 | 
 
-        if(account==null){
+```
+    if(account==null){
+
+```
 
  |
 | 
 
-           return;//isMessagingController returns false for null, but let's make itclear.
+```
+       return;//isMessagingController returns false for null, but let's make itclear.
+
+```
 
  |
 | 
 
-        }
+```
+    }
+
+```
 
  |
 | 
 
-        if(isMessagingController(account)) {
+```
+    if(isMessagingController(account)) {
+
+```
 
  |
 | 
 
-                  mLegacyController.processPendingActions(message.mAccountKey);
+```
+              mLegacyController.processPendingActions(message.mAccountKey);
+
+```
 
  |
 |  |
 | 
 
-           }
+```
+       }
+
+```
 
  |
 
 }.start();
 
-关于**AsyncTask:**[**http://developer.android.com/reference/android/os/AsyncTask.html**](http://developer.android.com/reference/android/os/AsyncTask.html)
+关于**AsyncTask:**[**http://developer.android.com/reference/android/os/AsyncTask.html**
 
-## 案例2：关键词:在UI线程进行网络数据的读写
+### 案例2：关键词:在UI线程进行网络数据的读写
 
 ANRin process: com.android.mediascape:PhotoViewer (last incom.android.mediascape:PhotoViewer)
 Annotation:keyDispatchingTimedOut
@@ -824,7 +853,7 @@ atdalvik.system.NativeStart.main(Native Method)
 
 关于网络连接，再设计的时候可以设置个timeout的时间或者放入独立的线程来处理。
 
-关于Handler的问题，可以参考：[**http://developer.android.com/reference/android/os/Handler.html**](http://developer.android.com/reference/android/os/Handler.html)
+关于Handler的问题，可以参考：[**http://developer.android.com/reference/android/os/Handler.html**
 
 案例3：
 
@@ -994,7 +1023,8 @@ DALVIK THREADS:
   at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:616)
   at dalvik.system.NativeStart.main(Native Method)
 
----------------------------------------------------------------------------------------------------------------------------------------
+------
+
 闲话少说， 我总结了观察log文件的基本步骤 。 1，如果是ANR问题 ， 则搜索“ANR”关键词 。 快速定位到关键事件信息 。
 2，如果是ForceClosed 和其它异常退出信息，则搜索"Fatal" 关键词， 快速定位到关键事件信息 。
 3，定位到关键事件信息后 ， 如果信息不够明确的，再去搜索应用程序包的虚拟机信息 ，查看具体的进程和线程跟踪的日志，来定位到代码 。 
@@ -1067,21 +1097,23 @@ DALVIK THREADS:
   | sysTid=3236 nice=0 sched=0/0 cgrp=default handle=2432120
   | schedstat=( 3225061 26561350 27 )
   at java.lang.Object.wait(Native Method)
-  - waiting on <0x482f4da8> (a android.os.MessageQueue)
+
+- waiting on <0x482f4da8> (a android.os.MessageQueue)
   at java.lang.Object.wait(Object.java:288)
-  at android.os.MessageQueue.next(MessageQueue.java:146)
-  at android.os.Looper.loop(Looper.java:110)
-  at android.os.HandlerThread.run(HandlerThread.java:60)
+    at android.os.MessageQueue.next(MessageQueue.java:146)
+    at android.os.Looper.loop(Looper.java:110)
+    at android.os.HandlerThread.run(HandlerThread.java:60)
 
 "Thread-9" prio=5 tid=8 WAIT
   | group="main" sCount=1 dsCount=0 s=N obj=0x4836e2b0 self=0x25af70
   | sysTid=2929 nice=0 sched=0/0 cgrp=default handle=2370896
   | schedstat=( 130248 4389035 2 )
   at java.lang.Object.wait(Native Method)
-  - waiting on <0x4836e240> (a java.util.ArrayList)
+
+- waiting on <0x4836e240> (a java.util.ArrayList)
   at java.lang.Object.wait(Object.java:288)
-  at com.android.mms.data.Contact$ContactsCache$TaskStack$1.run(Contact.java:488)
-  at java.lang.Thread.run(Thread.java:1096)
+    at com.android.mms.data.Contact$ContactsCache$TaskStack$1.run(Contact.java:488)
+    at java.lang.Thread.run(Thread.java:1096)
 
 "Binder Thread #2" prio=5 tid=7 NATIVE
   | group="main" sCount=1 dsCount=0 s=N obj=0x482f8ca0 self=0x130fd0
@@ -1125,22 +1157,26 @@ DALVIK THREADS:
   at com.android.mms.ui.SlideshowPresenter$3.run(SlideshowPresenter.java:531)
 定位到代码：
 mHandler.post(new Runnable() {
-                    public void run() {
-                        try {
-                            presentRegionMedia(view, (RegionMediaModel) model, dataChanged);
-                        } catch (OMADRMException e) {
-                            Log.e(TAG, e.getMessage(), e);
-                            Toast.makeText(mContext,
-                                    mContext.getString(R.string.insufficient_drm_rights),
-                                    Toast.LENGTH_SHORT).show();
-                        } catch (IOException e){
-                            Log.e(TAG, e.getMessage(), e);
-                            Toast.makeText(mContext,
-                                    mContext.getString(R.string.insufficient_drm_rights),
-                                    Toast.LENGTH_SHORT).show();
 
-                        }
+```
+                public void run() {
+                    try {
+                        presentRegionMedia(view, (RegionMediaModel) model, dataChanged);
+                    } catch (OMADRMException e) {
+                        Log.e(TAG, e.getMessage(), e);
+                        Toast.makeText(mContext,
+                                mContext.getString(R.string.insufficient_drm_rights),
+                                Toast.LENGTH_SHORT).show();
+                    } catch (IOException e){
+                        Log.e(TAG, e.getMessage(), e);
+                        Toast.makeText(mContext,
+                                mContext.getString(R.string.insufficient_drm_rights),
+                                Toast.LENGTH_SHORT).show();
+
                     }
+                }
+
+```
 
 很清楚了， Handler.post 方法之后执行时间太长的问题 。 继续看presentRegionMedia(view, (RegionMediaModel) model, dataChanged);方法 ， 发现最终是调用的framework 中MediaPlayer.stop方法 。
 至此，我们的日志分析算是告一段落 。 可以开始思考解决办法了
@@ -1149,7 +1185,10 @@ mHandler.post(new Runnable() {
 
 引用：
 [Android App优化之ANR详解](https://www.jianshu.com/p/6d855e984b99)
-如何分析解决Android ANR
+[如何分析解决Android ANR](https://blog.csdn.net/dadoneo/article/details/8270107)
+
+
+
 
 
 
