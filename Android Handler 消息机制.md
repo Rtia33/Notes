@@ -79,8 +79,8 @@
     - [](#-1)
   - [3、MessageQueue](#3messagequeue)
     - [3.1 创建MessageQueue](#31-%E5%88%9B%E5%BB%BAmessagequeue)
-    - [3.2 next()](#32-next)
-    - [3.3 enqueueMessage](#33-enqueuemessage)
+    - [3.2 enqueueMessage](#32-enqueuemessage)
+    - [3.3 next()](#33-next)
     - [3.4 removeMessages](#34-removemessages)
     - [3.5 postSyncBarrier](#35-postsyncbarrier)
   - [4、 Message](#4-message)
@@ -427,7 +427,7 @@ API是我们学习最好的文档
 - **boolean post (Runnable r)**
   将Runnable对象加入MessageQueue。
 
-- **boolean post (Runnable r)**
+- **boolean postAtFrontOfQueue (Runnable r)**
   将Runnbale加入到消息队列的队首。但是官方不推荐这么做，因为很容易打乱队列顺序。
 
 - **boolean postAtTime (Runnable r, Object token, long uptimeMillis)**
@@ -443,7 +443,7 @@ API是我们学习最好的文档
   移除MessageQueue中的所有Runnable和Message对象。
 
 - **void removeMessages (int what)**
-  移除所有what值得Message对象。
+  移除所有what值的Message对象。
 
 - **boolean sendEmptyMessage (int what)**
   直接拿到一个空的消息，并赋值what，然后发送到MessageQueue。
@@ -458,16 +458,12 @@ API是我们学习最好的文档
 
 在上面的例子中，为了展示方便，我都没有考虑内存泄漏的情况，但是在实际开发中，如果不考虑代码的安全性的话，尤其当一个项目到达了一定的规模之后，那么对于代码的维护和系统的调试都是非常困难的。而Handler的内存泄漏在Android中也是一个非常经典的案例。
 
-详细可以参考：[How to Leak a Context: Handlers & Inner Classes](http://www.androiddesignpatterns.com/2013/01/inner-class-handler-memory-leak.html)
-
-或参考翻译文：[Android中Handler引起的内存泄露](http://droidyue.com/blog/2014/12/28/in-android-handler-classes-should-be-static-or-leaks-might-occur/)
-
 ### 典型错误的使用示例
 
 ```java
 public class LeakActivity extends AppCompatActivity {
     private int a = 10;
-    //也是匿名内部类，也会引用外部
+    //new Handler匿名内部类，会引用外部
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -483,6 +479,7 @@ public class LeakActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leak);
         mHandler.sendEmptyMessageDelayed(0, 5000);
+        //new Runnable也是匿名内部类，也会引用外部
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -536,7 +533,7 @@ private static class MyHandler extends Handler {
 }
 ```
 
-### 解决方案1：
+### 解决方案：
 
 把**Activity通过弱引用来作为成员变量**。虽然我们把Activity作为弱引用，但是Activity不一定就是会在GC的时候被回收，因为可能还有其他对象引用了Activity。在处理消息的时候就要**注意**了，**当Activity回收或者正在finish的时候，就不能继续处理消息**了。
 
@@ -776,9 +773,6 @@ boolean enqueueMessage(Message msg, long when)
 ### next
 **取出**一条消息并且把这条消息从消息队列中移除
 ```java
-Message next()
-```
-```java
 /* MessageQueue源码 */
 Message next() {
     ...
@@ -953,15 +947,15 @@ private boolean enqueueMessage(MessageQueue queue, Message msg, long uptimeMilli
 ```java
 /* Handler源码 */
 public void dispatchMessage(Message msg) {    
-    if (msg.callback != null) {//msg.callback
-        handleCallback(msg);//①
+    if (msg.callback != null) {// ① 若msg.callback属性不为空，则代表使用了post(Runnable r)发送消息；
+        handleCallback(msg);// ① 即回调Runnable对象里复写的run()
     } else {        
-        if (mCallback != null) {//mCallback
-            if (mCallback.handleMessage(msg)) {//②
+        if (mCallback != null) {//② 由Handler的构造函数可知，mCallback是在创建Handler时传递进来的
+            if (mCallback.handleMessage(msg)) {//② 
                 return;
             }
         }
-        handleMessage(msg);//③
+        handleMessage(msg);//③ Handler自己handleMessage方法
     }
 }
 ```
@@ -990,8 +984,7 @@ private static Message getPostMessage(Runnable r) {
 ```
 
 #### ① handleCallback(msg)
-由下源码可知，**handleCallback(msg)就是去执行runnbale中的run函数**。没错,这里**将开启一个线程**。
-所以我们就明白了最开始我们提到的使用Handler处理耗时操作和UI操作的原理了。
+由下源码可知，**handleCallback(msg)就是去执行runnbale中的run函数**。
 ```java
 /* Handler源码 */
 private static void handleCallback(Message message) {
@@ -1802,7 +1795,63 @@ MessageQueue(boolean quitAllowed) {
 }
 ```
 
-### 3.2 next()
+### 3.2 enqueueMessage
+添加一条消息到消息队列
+`MessageQueue`是按照Message触发时间的先后顺序排列的，队头的消息是将要最早触发的消息。当有消息需要加入消息队列时，会从队列头开始遍历，直到找到消息应该插入的合适位置，以保证所有消息的时间顺序。
+```java
+boolean enqueueMessage(Message msg, long when) {
+    // 每一个普通Message必须有一个target（即Handler）
+    if (msg.target == null) {
+        throw new IllegalArgumentException("Message must have a target.");
+    }
+    if (msg.isInUse()) {
+        throw new IllegalStateException(msg + " This message is already in use.");
+    }
+    synchronized (this) {
+        if (mQuitting) {  //正在退出时，回收msg，加入到消息池
+            msg.recycle();
+            return false;
+        }
+        msg.markInUse();
+        msg.when = when;
+        Message p = mMessages;
+        boolean needWake;
+        if (p == null || when == 0 || when < p.when) {
+            //p为null(代表MessageQueue没有消息） 或者msg的触发时间是队列中最早的， 则进入该该分支，把msg插在p前面，即队列最前面
+            msg.next = p;
+            mMessages = msg;
+            needWake = mBlocked; //当阻塞时需要唤醒
+        } else {
+            //将消息按时间顺序插入到MessageQueue。一般地，不需要唤醒事件队列，
+            //除非消息队头存在barrier，并且同时Message是队列中最早的异步消息。
+            needWake = mBlocked && p.target == null && msg.isAsynchronous();
+            //下面的代码就是遍历单链表
+            Message prev;
+            for (;;) {
+                prev = p;
+                p = p.next;
+                if (p == null || when < p.when) {
+                    break;//p为链表的尾部，或者时间刚好比传进来的msg晚一点
+                }
+                if (needWake && p.isAsynchronous()) {
+                    needWake = false;
+                }
+            }
+            msg.next = p;
+            prev.next = msg;//把传进来的消息插入链表(prev和p中间)
+        }
+        //消息没有退出，我们认为此时mPtr != 0
+        if (needWake) {
+            nativeWake(mPtr);
+        }
+    }
+    return true;
+}
+```
+
+
+
+### 3.3 next()
 提取下一条message。
 消息的取出并不是直接就从队列的头部**取出**的，而是**根据**了**消息的when时间参数**有关的，因为我们可以发送延时消息、也可以发送一个指定时间点的消息。
 
@@ -1900,62 +1949,6 @@ Message next() {
         //当调用一个空闲handler时，一个新message能够被分发，因此无需等待可以直接查询pending message.
         nextPollTimeoutMillis = 0;
     }
-}
-```
-
-
-
-### 3.3 enqueueMessage
-添加一条消息到消息队列
-`MessageQueue`是按照Message触发时间的先后顺序排列的，队头的消息是将要最早触发的消息。当有消息需要加入消息队列时，会从队列头开始遍历，直到找到消息应该插入的合适位置，以保证所有消息的时间顺序。
-```java
-boolean enqueueMessage(Message msg, long when) {
-    // 每一个普通Message必须有一个target（即Handler）
-    if (msg.target == null) {
-        throw new IllegalArgumentException("Message must have a target.");
-    }
-    if (msg.isInUse()) {
-        throw new IllegalStateException(msg + " This message is already in use.");
-    }
-    synchronized (this) {
-        if (mQuitting) {  //正在退出时，回收msg，加入到消息池
-            msg.recycle();
-            return false;
-        }
-        msg.markInUse();
-        msg.when = when;
-        Message p = mMessages;
-        boolean needWake;
-        if (p == null || when == 0 || when < p.when) {
-            //p为null(代表MessageQueue没有消息） 或者msg的触发时间是队列中最早的， 则进入该该分支
-            msg.next = p;
-            mMessages = msg;
-            needWake = mBlocked; //当阻塞时需要唤醒
-        } else {
-            //将消息按时间顺序插入到MessageQueue。一般地，不需要唤醒事件队列，
-            //除非消息队头存在barrier，并且同时Message是队列中最早的异步消息。
-            needWake = mBlocked && p.target == null && msg.isAsynchronous();
-            //下面的代码就是遍历单链表
-            Message prev;
-            for (;;) {
-                prev = p;
-                p = p.next;
-                if (p == null || when < p.when) {
-                    break;//p为链表的尾部，或者时间刚好比传进来的msg晚一点
-                }
-                if (needWake && p.isAsynchronous()) {
-                    needWake = false;
-                }
-            }
-            msg.next = p;
-            prev.next = msg;//把传进来的消息插入链表(prev和p中间)
-        }
-        //消息没有退出，我们认为此时mPtr != 0
-        if (needWake) {
-            nativeWake(mPtr);
-        }
-    }
-    return true;
 }
 ```
 
@@ -2256,13 +2249,13 @@ public static void main(String[] args) {
 主线程的消息又是哪来的呢？当然是App进程中的其他线程通过Handler发送给主线程
 
 - system_server进程
-  system_server进程是系统进程，java framework框架的核心载体，里面运行了大量的系统服务，比如这里提供`ApplicationThreadProxy`（简称ATP），`ActivityManagerService`（简称AMS），这个两个服务都运行在system_server进程的不同线程中，由于ATP和AMS都是基于IBinder接口，都是binder线程，binder线程的创建与销毁都是由binder驱动来决定的。
+system_server进程是系统进程，java framework框架的核心载体，里面运行了大量的系统服务，比如这里提供`ApplicationThreadProxy`（简称ATP），`ActivityManagerService`（简称AMS），这个两个服务都运行在system_server进程的不同线程中，由于ATP和AMS都是基于IBinder接口，都是binder线程，binder线程的创建与销毁都是由binder驱动来决定的。
 
 - App进程
-  App进程则是我们常说的应用程序，主线程主要负责Activity/Service等组件的生命周期以及UI相关操作都运行在这个线程； 另外，每个App进程中至少会有两个binder线程 `ApplicationThread`(简称AT)和`ActivityManagerProxy`（简称AMP），除了图中画的线程，其中还有很多线程
+App进程则是我们常说的应用程序，主线程主要负责Activity/Service等组件的生命周期以及UI相关操作都运行在这个线程； 另外，每个App进程中至少会有两个binder线程 `ApplicationThread`(简称AT)和`ActivityManagerProxy`（简称AMP），除了图中画的线程，其中还有很多线程
 
 - Binder
-  **Binder用于不同进程之间通信**，由一个进程的Binder客户端向另一个进程的服务端发送事务，比如图中线程2向线程4发送事务；
+**Binder用于不同进程之间通信**，由一个进程的Binder客户端向另一个进程的服务端发送事务，比如图中线程2向线程4发送事务；
   而handler用于同一个进程中不同线程的通信，比如图中线程4向主线程发送消息。
 
 ![](http://upload-images.jianshu.io/upload_images/9028834-d0b7627437af8789?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
